@@ -60,7 +60,7 @@ public class MetadataStatsCollector {
      * @return a Kryo instance that can be used to compute the size of messages
      */
     public Kryo getFreshKryo() {
-        final Kryo kryo = KryoLib.kryoWithoutAutoreset();
+        final Kryo kryo = KryoLib.kryoWithoutAutoReset();
         kryo.reset();
         return kryo;
     }

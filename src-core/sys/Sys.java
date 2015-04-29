@@ -17,7 +17,7 @@
 package sys;
 
 import swift.utils.KryoCRDTUtils;
-import sys.net.impl.NetworkingImpl;
+import sys.net.impl.KryoLib;
 import sys.scheduler.TaskScheduler;
 import sys.utils.IP;
 import java.util.Random;
@@ -37,7 +37,7 @@ public class Sys {
         StackTraceElement[] sta = Thread.currentThread().getStackTrace();
         mainClass = sta[sta.length - 1].getClassName() + " @ " + IP.localHostname();
         KryoCRDTUtils.init();
-        NetworkingImpl.init();
+        KryoLib.init();
     }
 
     synchronized public static Sys getInstance() {

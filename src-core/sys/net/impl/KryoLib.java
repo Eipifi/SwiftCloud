@@ -16,22 +16,51 @@
  *****************************************************************************/
 package sys.net.impl;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
-import java.util.logging.Logger;
-
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.Serializer;
 import sys.net.impl.providers.InitiatorInfo;
 import sys.net.impl.rpc.RpcPacket;
 
-import com.esotericsoftware.kryo.Kryo;
-import com.esotericsoftware.kryo.Serializer;
-import com.esotericsoftware.kryo.io.Input;
-import com.esotericsoftware.kryo.io.Output;
+import java.util.HashMap;
+import java.util.Map;
 
 public class KryoLib {
-    private static Logger Log = Logger.getLogger(RpcPacket.class.getName());
+
+    private static final Map<Integer, Entry> entries = new HashMap<>();
+    private static final ThreadLocal<Kryo> localKryoReset = ThreadLocal.withInitial(() -> newInstance(true));
+    private static final ThreadLocal<Kryo> localKryoNoReset = ThreadLocal.withInitial(() -> newInstance(false));
+
+    public static <T> void register(Class<T> clazz, Serializer<? super T> serializer, int id) {
+        if(entries.containsKey(id)) { throw new IllegalArgumentException("Type ID already taken"); }
+        Entry<T> e = new Entry<>();
+        e.clazz = clazz;
+        e.serializer = serializer;
+        entries.put(id, e);
+    }
+
+    public static void register(Class<?> clazz, int id) {
+        register(clazz, null, id);
+    }
+
+    private static Kryo newInstance(boolean autoReset) {
+        Kryo kryo = new Kryo();
+        for(Map.Entry<Integer, Entry> e: entries.entrySet()) {
+            Entry entry = e.getValue();
+            if (entry.serializer == null)
+                kryo.register(entry.clazz, e.getKey());
+            else
+                kryo.register(entry.clazz, entry.serializer, e.getKey());
+        }
+        kryo.setAsmEnabled(true);
+        kryo.setReferences(true);
+        kryo.setAutoReset(autoReset);
+        return kryo;
+    }
+
+    private static class Entry<T> {
+        Class<T> clazz;
+        Serializer<? super T> serializer;
+    }
 
     synchronized public static <T> T copy(T obj) {
         return kryo().copy(obj);
@@ -41,139 +70,14 @@ public class KryoLib {
         return kryo().copyShallow(obj);
     }
 
-    synchronized public static Kryo getKryoInstance() {
-        Kryo res = new _Kryo(registry);
-        for (_Registration i : registry)
-            if (i.ser != null)
-                res.register(i.cl, i.ser, i.id);
-            else
-                res.register(i.cl, i.id);
+    public static Kryo kryo() { return localKryoReset.get(); }
 
-        res.setAsmEnabled(true);
-        res.setReferences(true);
-        return res;
-    }
-
-    synchronized public static void register(Class<?> cl, int id) {
-        for (_Registration i : registry)
-            if (i.id == id) {
-                Log.severe("Already Registered..." + id);
-                return;
-            }
-        registry.add(new _Registration(cl, null, id));
-    }
-
-    synchronized public static <T> void register(Class<T> cl, Serializer<? super T> serializer, int id) {
-        for (_Registration i : registry)
-            if (i.id == id) {
-                Log.severe("Already Registered..." + id);
-                Thread.dumpStack();
-            }
-        registry.add(new _Registration(cl, serializer, id));
-    }
+    public static Kryo kryoWithoutAutoReset() { return localKryoNoReset.get(); }
 
     synchronized public static void init() {
-
-        register(LocalEndpoint.class, new Serializer<AbstractEndpoint>() {
-
-            @Override
-            final public AbstractEndpoint read(Kryo kryo, Input input, Class<AbstractEndpoint> arg2) {
-                return new RemoteEndpoint(input.readLong(), input.readLong());
-            }
-
-            @Override
-            final public void write(Kryo kryo, Output output, AbstractEndpoint val) {
-                output.writeLong(val.locator);
-                output.writeLong(val.gid);
-            }
-
-        }, 0x20);
-        register(RemoteEndpoint.class, new Serializer<AbstractEndpoint>() {
-
-            @Override
-            final public AbstractEndpoint read(Kryo kryo, Input input, Class<AbstractEndpoint> arg2) {
-                return new RemoteEndpoint(input.readLong(), input.readLong());
-            }
-
-            @Override
-            final public void write(Kryo kryo, Output output, AbstractEndpoint val) {
-                output.writeLong(val.locator);
-                output.writeLong(val.gid);
-            }
-
-        }, 0x21);
-
+        register(LocalEndpoint.class, new EndpointSerializer(), 0x20);
+        register(RemoteEndpoint.class, new EndpointSerializer(), 0x21);
         register(RpcPacket.class, 0x22);
         register(InitiatorInfo.class, 0x23);
-    }
-
-    static class _Registration implements Comparable<_Registration> {
-
-        int id;
-        Class<?> cl;
-        Serializer<?> ser;
-
-        _Registration(Class<?> cl, Serializer<?> ser, int id) {
-            this.cl = cl;
-            this.ser = ser;
-            this.id = id;
-        }
-
-        public String toString() {
-            return String.format("<%s, %d>", cl.getSimpleName(), id);
-        }
-
-        public int hashCode() {
-            return id;
-        }
-
-        public boolean equals(Object other) {
-            return other != null && ((_Registration) other).id == id;
-        }
-
-        @Override
-        public int compareTo(_Registration other) {
-            return id - other.id;
-        }
-    }
-
-    private static Set<_Registration> registry = new HashSet<_Registration>();
-
-    static class _Kryo extends Kryo {
-        SortedSet<_Registration> _registrations;
-
-        _Kryo(Set<_Registration> rs) {
-            _registrations = new TreeSet<_Registration>(rs);
-        }
-
-        public String toString() {
-            return _registrations.toString();
-        }
-    }
-
-    private static final ThreadLocal<Kryo> kryo = new ThreadLocal<Kryo>() {
-        @Override
-        protected Kryo initialValue() {
-            final Kryo kryo = getKryoInstance();
-            kryo.setAutoReset(true);
-            return kryo;
-        }
-    };
-
-    private static final ThreadLocal<Kryo> kryoWithoutReset = new ThreadLocal<Kryo>() {
-        @Override
-        protected Kryo initialValue() {
-            final Kryo kryo = getKryoInstance();
-            kryo.setAutoReset(false);
-            return kryo;
-        }
-    };
-
-    public static Kryo kryo() {
-        return kryo.get();
-    }
-
-    public static Kryo kryoWithoutAutoreset() {
-        return kryoWithoutReset.get();
     }
 }

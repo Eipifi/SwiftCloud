@@ -26,13 +26,6 @@ import sys.net.impl.rpc.RpcFactoryImpl;
 
 public class NetworkingImpl extends Networking {
 
-    public NetworkingImpl() { }
-
-    public static void init() {
-        new NetworkingImpl();
-        KryoLib.init();
-    }
-
     @Override
     synchronized public Endpoint bind(final int tcpPort, MessageHandler handler) {
         return bind(tcpPort, TransportProvider.DEFAULT, handler);
