@@ -19,7 +19,6 @@ package swift.dc;
 import static swift.clocks.CausalityClock.CMP_CLOCK.CMP_DOMINATES;
 import static swift.clocks.CausalityClock.CMP_CLOCK.CMP_EQUALS;
 import static swift.dc.DCConstants.DATABASE_CLASS;
-import static sys.net.api.Networking.Networking;
 import static sys.net.api.Networking.TransportProvider.DEFAULT;
 import static sys.net.api.Networking.TransportProvider.INPROC;
 
@@ -59,6 +58,7 @@ import swift.proto.SeqCommitUpdatesReply;
 import swift.proto.SeqCommitUpdatesRequest;
 import swift.proto.SwiftProtocolHandler;
 import sys.net.api.Endpoint;
+import sys.net.api.Networking;
 import sys.net.api.Networking.TransportProvider;
 import sys.net.api.rpc.RpcEndpoint;
 import sys.net.api.rpc.RpcHandle;
@@ -266,34 +266,33 @@ public class DCSequencerServer extends SwiftProtocolHandler {
     }
 
     public void start() {
-        sys.Sys.getInstance();
 
         // Note: Networking.resolve() now accepts host[:port], the port
         // parameter is used as default, if port is missing
-        this.serversEP = new ArrayList<Endpoint>();
+        this.serversEP = new ArrayList<>();
         for (String s : servers)
-            serversEP.add(Networking.resolve(s, DCConstants.SURROGATE_PORT_FOR_SEQUENCERS));
+            serversEP.add(Networking.getInstance().resolve(s, DCConstants.SURROGATE_PORT_FOR_SEQUENCERS));
 
         if (serversEP.isEmpty())
-            serversEP.add(Networking.resolve("localhost", DCConstants.SURROGATE_PORT_FOR_SEQUENCERS));
+            serversEP.add(Networking.getInstance().resolve("localhost", DCConstants.SURROGATE_PORT_FOR_SEQUENCERS));
 
         this.sequencersEP = new ArrayList<Endpoint>();
         for (String s : sequencers)
-            sequencersEP.add(Networking.resolve(s, DCConstants.SEQUENCER_PORT));
+            sequencersEP.add(Networking.getInstance().resolve(s, DCConstants.SEQUENCER_PORT));
 
-        this.srvEndpoint = Networking.rpcBind(port).toDefaultService().setHandler(this);
+        this.srvEndpoint = Networking.getInstance().rpcBind(port).toDefaultService().setHandler(this);
 
         TransportProvider provider = Args.contains("-integrated") ? INPROC : DEFAULT;
 
-        this.cltEndpoint4Surrogates = Networking.rpcConnect(provider).toDefaultService();
+        this.cltEndpoint4Surrogates = Networking.getInstance().rpcConnect(provider).toDefaultService();
 
         if (Args.contains("-integrated"))
-            this.srvEndpoint4Surrogates = Networking.rpcBind(port, provider).toDefaultService().setHandler(this);
+            this.srvEndpoint4Surrogates = Networking.getInstance().rpcBind(port, provider).toDefaultService().setHandler(this);
         else
             this.srvEndpoint4Surrogates = srvEndpoint;
 
         if (sequencerShadow != null)
-            sequencerShadowEP = Networking.resolve(sequencerShadow, DCConstants.SEQUENCER_PORT);
+            sequencerShadowEP = Networking.getInstance().resolve(sequencerShadow, DCConstants.SEQUENCER_PORT);
 
         if (!isBackup) {
             synchronizer();

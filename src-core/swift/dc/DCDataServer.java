@@ -16,7 +16,6 @@
  *****************************************************************************/
 package swift.dc;
 
-import static sys.net.api.Networking.Networking;
 import static sys.utils.Threading.lock;
 import static sys.utils.Threading.unlock;
 
@@ -58,6 +57,7 @@ import swift.pubsub.UpdateNotification;
 import swift.utils.FutureResultHandler;
 import sys.dht.DHT_Node;
 import sys.net.api.Endpoint;
+import sys.net.api.Networking;
 import sys.net.api.rpc.RpcEndpoint;
 import sys.net.api.rpc.RpcHandle;
 import sys.net.api.rpc.RpcMessage;
@@ -213,8 +213,8 @@ final class DCDataServer {
 
     void initDHT() {
 
-        dhtEndpoint = Networking.rpcConnect().toDefaultService();
-        Networking.rpcBind(DHT_Node.DHT_PORT).toService(0, new SwiftProtocolHandler() {
+        dhtEndpoint = Networking.getInstance().rpcConnect().toDefaultService();
+        Networking.getInstance().rpcBind(DHT_Node.DHT_PORT).toService(0, new SwiftProtocolHandler() {
 
             public void onReceive(RpcHandle con, DHTGetCRDT request) {
                 if (logger.isLoggable(Level.INFO)) {

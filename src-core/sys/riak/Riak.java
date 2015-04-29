@@ -16,7 +16,7 @@
  *****************************************************************************/
 package sys.riak;
 
-import static sys.net.api.Networking.Networking;
+import sys.net.api.Networking;
 import sys.net.api.Serializer;
 
 import com.basho.riak.client.IRiakClient;
@@ -103,7 +103,7 @@ public class Riak {
 
     static {
         try {
-            serializer = Networking.serializer();
+            serializer = Networking.getInstance().serializer();
             riak = RiakFactory.pbcClient();
 
         } catch (RiakException e) {

@@ -52,13 +52,13 @@ public class Node {
         this.endpoint = endpoint;
         this.datacenter = datacenter;
         this.key = locator2key(endpoint.locator());
-        this.dhtEndpoint = Networking.Networking.resolve(endpoint.getHost(), DHT_Node.DHT_PORT);
+        this.dhtEndpoint = Networking.getInstance().resolve(endpoint.getHost(), DHT_Node.DHT_PORT);
     }
 
     public Node(long key, Endpoint endpoint) {
         this.key = key;
         this.endpoint = endpoint;
-        this.dhtEndpoint = Networking.Networking.resolve(endpoint.getHost(), DHT_Node.DHT_PORT);
+        this.dhtEndpoint = Networking.getInstance().resolve(endpoint.getHost(), DHT_Node.DHT_PORT);
     }
 
     @Override

@@ -1,7 +1,5 @@
 package swift.pubsub;
 
-import static sys.net.api.Networking.Networking;
-
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -18,6 +16,7 @@ import swift.proto.SwiftProtocolHandler;
 import swift.proto.UnsubscribeUpdatesReply;
 import swift.proto.UnsubscribeUpdatesRequest;
 import sys.net.api.Endpoint;
+import sys.net.api.Networking;
 import sys.net.api.rpc.RpcEndpoint;
 import sys.net.api.rpc.RpcHandle;
 import sys.pubsub.PubSubNotification;
@@ -53,8 +52,8 @@ abstract public class ScoutPubSubService extends AbstractPubSub<CRDTIdentifier> 
             }
         };
 
-        this.suPubSub = Networking.resolve(surrogate.getHost(), surrogate.getPort() + 1);
-        this.endpoint = Networking.rpcConnect().toService(0, new SwiftProtocolHandler() {
+        this.suPubSub = Networking.getInstance().resolve(surrogate.getHost(), surrogate.getPort() + 1);
+        this.endpoint = Networking.getInstance().rpcConnect().toService(0, new SwiftProtocolHandler() {
             @Override
             public void onReceive(BatchUpdatesNotification evt) {
                 fifoQueue.offer(evt.seqN(), evt);

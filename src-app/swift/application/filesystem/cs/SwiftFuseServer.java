@@ -17,8 +17,6 @@
  *****************************************************************************/
 package swift.application.filesystem.cs;
 
-import static sys.net.api.Networking.Networking;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -37,6 +35,7 @@ import swift.dc.DCConstants;
 import swift.dc.DCSequencerServer;
 import swift.dc.DCServer;
 import sys.Sys;
+import sys.net.api.Networking;
 import sys.net.api.Networking.TransportProvider;
 import sys.net.api.rpc.RpcEndpoint;
 import sys.utils.Args;
@@ -75,7 +74,7 @@ public class SwiftFuseServer extends RemoteFuseOperationHandler {
         Sys.getInstance();
 
         log.info("setting up servers");
-        endpoint = Networking.rpcBind(PORT, TransportProvider.DEFAULT).toService(0, this);
+        endpoint = Networking.getInstance().rpcBind(PORT, TransportProvider.DEFAULT).toService(0, this);
 
         try {
             server = SwiftImpl.newSingleSessionInstance(new SwiftOptions(dcServer, DCConstants.SURROGATE_PORT));

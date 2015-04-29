@@ -16,7 +16,6 @@
  *****************************************************************************/
 package swift.dc;
 
-import static sys.net.api.Networking.Networking;
 import static sys.net.api.Networking.TransportProvider.DEFAULT;
 import static sys.net.api.Networking.TransportProvider.INPROC;
 
@@ -77,6 +76,7 @@ import swift.utils.SafeLog.ReportType;
 import sys.Sys;
 import sys.dht.DHT_Node;
 import sys.net.api.Endpoint;
+import sys.net.api.Networking;
 import sys.net.api.Networking.TransportProvider;
 import sys.net.api.rpc.RpcEndpoint;
 import sys.net.api.rpc.RpcHandle;
@@ -141,11 +141,11 @@ final public class DCSurrogate extends SwiftProtocolHandler {
         };
 
         this.sequencerServerEndpoint = sequencerEndpoint;
-        this.srvEndpoint4Clients = Networking.rpcBind(port4Clients).toDefaultService();
+        this.srvEndpoint4Clients = Networking.getInstance().rpcBind(port4Clients).toDefaultService();
 
         TransportProvider provider = Args.contains("-integrated") ? INPROC : DEFAULT;
-        this.cltEndpoint4Sequencer = Networking.rpcConnect(provider).toDefaultService();
-        this.srvEndpoint4Sequencer = Networking.rpcBind(port4Sequencers, provider).toDefaultService();
+        this.cltEndpoint4Sequencer = Networking.getInstance().rpcConnect(provider).toDefaultService();
+        this.srvEndpoint4Sequencer = Networking.getInstance().rpcBind(port4Sequencers, provider).toDefaultService();
 
         srvEndpoint4Clients.setHandler(this);
         srvEndpoint4Sequencer.setHandler(this);

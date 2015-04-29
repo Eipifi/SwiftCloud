@@ -16,8 +16,6 @@
  *****************************************************************************/
 package sys.herd;
 
-import static sys.net.api.Networking.Networking;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Semaphore;
@@ -28,6 +26,7 @@ import sys.herd.proto.GrazingGranted;
 import sys.herd.proto.GrazingRequest;
 import sys.herd.proto.ShepardProtoHandler;
 import sys.net.api.Endpoint;
+import sys.net.api.Networking;
 import sys.net.api.Networking.TransportProvider;
 import sys.net.api.rpc.RpcEndpoint;
 import sys.net.api.rpc.RpcHandle;
@@ -50,8 +49,8 @@ public class Shepard extends ShepardProtoHandler {
     private static final int PORT = 29876;
 
     public static void sheepJoinHerd(String shepardAddress) {
-        Endpoint shepard = Networking.resolve(shepardAddress, PORT);
-        RpcEndpoint endpoint = Networking.rpcConnect(TransportProvider.DEFAULT).toDefaultService();
+        Endpoint shepard = Networking.getInstance().resolve(shepardAddress, PORT);
+        RpcEndpoint endpoint = Networking.getInstance().rpcConnect(TransportProvider.DEFAULT).toDefaultService();
         System.err.println("Contacting shepard at: " + shepardAddress);
 
         final Semaphore barrier = new Semaphore(0);
@@ -88,7 +87,7 @@ public class Shepard extends ShepardProtoHandler {
     public Shepard(int duration) {
         this.grazingDuration = duration;
         this.waitingSheep = new ArrayList<RpcHandle>();
-        this.endpoint = Networking.rpcBind(PORT, TransportProvider.DEFAULT).toService(0, this);
+        this.endpoint = Networking.getInstance().rpcBind(PORT, TransportProvider.DEFAULT).toService(0, this);
     }
 
     public static void main(String[] args) {

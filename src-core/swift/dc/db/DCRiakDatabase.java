@@ -16,8 +16,6 @@
  *****************************************************************************/
 package swift.dc.db;
 
-import static sys.net.api.Networking.Networking;
-
 import java.io.IOException;
 import java.util.Properties;
 
@@ -31,6 +29,7 @@ import com.basho.riak.client.raw.RawClient;
 import com.basho.riak.client.raw.RiakResponse;
 import com.basho.riak.client.raw.pbc.PBClientAdapter;
 import com.basho.riak.pbc.RiakClient;
+import sys.net.api.Networking;
 
 public class DCRiakDatabase implements DCNodeDatabase {
     String url;
@@ -59,9 +58,9 @@ public class DCRiakDatabase implements DCNodeDatabase {
             if (response.hasValue()) {
                 if (response.hasSiblings()) {
                     IRiakObject[] obj = response.getRiakObjects();
-                    CRDTData<?> data = (CRDTData<?>) Networking.serializer().readObject(obj[0].getValue());
+                    CRDTData<?> data = (CRDTData<?>) Networking.getInstance().serializer().readObject(obj[0].getValue());
                     for (int i = 1; i < obj.length; i++) {
-                        CRDTData<?> t = (CRDTData<?>) Networking.serializer().readObject(obj[i].getValue());
+                        CRDTData<?> t = (CRDTData<?>) Networking.getInstance().serializer().readObject(obj[i].getValue());
                         // FIXME: this is an outcome of change to the op-based
                         // model and discussions over e-mail.
                         // It's unclear whether this should ever happen given
@@ -74,7 +73,7 @@ public class DCRiakDatabase implements DCNodeDatabase {
                 } else {
                     IRiakObject[] obj = response.getRiakObjects();
                     byte[] arr = obj[0].getValue();
-                    return (CRDTData<?>) Networking.serializer().readObject(arr);
+                    return (CRDTData<?>) Networking.getInstance().serializer().readObject(arr);
                 }
             } else
                 return null;
@@ -89,7 +88,7 @@ public class DCRiakDatabase implements DCNodeDatabase {
         try {
             DCConstants.DCLogger.info("RIAK.store " + id + ": what:" + data.getId());
 
-            byte[] arr = Networking.serializer().writeObject(data);
+            byte[] arr = Networking.getInstance().serializer().writeObject(data);
             IRiakObject riakObject = RiakObjectBuilder.newBuilder(id.getTable(), id.getKey()).withValue(arr).build();
 
             riak.store(riakObject);
@@ -116,7 +115,7 @@ public class DCRiakDatabase implements DCNodeDatabase {
                     IRiakObject[] obj = response.getRiakObjects();
                     Object[] objs = new Object[obj.length];
                     for (int i = 0; i < obj.length; i++)
-                        objs[i] = Networking.serializer().readObject(obj[0].getValue());
+                        objs[i] = Networking.getInstance().serializer().readObject(obj[0].getValue());
                     return objs;
                 } else {
                     IRiakObject[] obj = response.getRiakObjects();
@@ -135,7 +134,7 @@ public class DCRiakDatabase implements DCNodeDatabase {
         try {
             DCConstants.DCLogger.info("RIAK.SYSstore " + table + ": what:" + key);
 
-            byte[] arr = Networking.serializer().writeObject(data);
+            byte[] arr = Networking.getInstance().serializer().writeObject(data);
             IRiakObject riakObject = RiakObjectBuilder.newBuilder(table, key).withValue(arr).build();
 
             riak.store(riakObject);

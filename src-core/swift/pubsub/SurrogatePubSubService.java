@@ -1,7 +1,5 @@
 package swift.pubsub;
 
-import static sys.net.api.Networking.Networking;
-
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
@@ -17,6 +15,7 @@ import swift.proto.PubSubHandshakeReply;
 import swift.proto.SwiftProtocolHandler;
 import swift.proto.UnsubscribeUpdatesReply;
 import swift.proto.UnsubscribeUpdatesRequest;
+import sys.net.api.Networking;
 import sys.net.api.rpc.RpcEndpoint;
 import sys.net.api.rpc.RpcHandle;
 import sys.pubsub.PubSubNotification;
@@ -73,7 +72,7 @@ public class SurrogatePubSubService extends AbstractPubSub<CRDTIdentifier> imple
                 handle.reply(new UnsubscribeUpdatesReply(request.getId()));
             }
         };
-        this.endpoint = Networking.rpcBind(surrogate.pubsubPort).toService(0, handler);
+        this.endpoint = Networking.getInstance().rpcBind(surrogate.pubsubPort).toService(0, handler);
     }
 
     public RpcEndpoint endpoint() {

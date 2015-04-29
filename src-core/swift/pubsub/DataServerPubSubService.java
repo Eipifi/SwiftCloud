@@ -1,7 +1,5 @@
 package swift.pubsub;
 
-import static sys.net.api.Networking.Networking;
-
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
@@ -9,6 +7,7 @@ import java.util.concurrent.Executor;
 import swift.crdt.core.CRDTIdentifier;
 import swift.dc.DCSurrogate;
 import sys.net.api.Endpoint;
+import sys.net.api.Networking;
 import sys.net.api.rpc.RpcEndpoint;
 import sys.pubsub.RemoteSubscriber;
 import sys.pubsub.impl.AbstractPubSub;
@@ -23,7 +22,7 @@ public class DataServerPubSubService extends AbstractPubSub<CRDTIdentifier> {
         super(id);
         this.executor = executor;
         this.surrogate = surrogate;
-        this.endpoint = Networking.rpcConnect().toDefaultService();
+        this.endpoint = Networking.getInstance().rpcConnect().toDefaultService();
     }
 
     public void subscribe(CRDTIdentifier key, Endpoint remote) {

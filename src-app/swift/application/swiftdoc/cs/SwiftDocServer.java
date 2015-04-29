@@ -16,8 +16,6 @@
  *****************************************************************************/
 package swift.application.swiftdoc.cs;
 
-import static sys.net.api.Networking.Networking;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -51,6 +49,7 @@ import swift.dc.DCConstants;
 import swift.dc.DCSequencerServer;
 import swift.dc.DCServer;
 import sys.Sys;
+import sys.net.api.Networking;
 import sys.net.api.Networking.TransportProvider;
 import sys.net.api.rpc.RpcHandle;
 import sys.utils.Threading;
@@ -113,7 +112,7 @@ public class SwiftDocServer {
     static void scoutServerCommonCode(final int port, final CRDTIdentifier d1, final CRDTIdentifier d2) {
         try {
 
-            Networking.rpcBind(port, TransportProvider.DEFAULT).toService(0, new AppRpcHandler() {
+            Networking.getInstance().rpcBind(port, TransportProvider.DEFAULT).toService(0, new AppRpcHandler() {
 
                 public void onReceive(RpcHandle client, final InitScoutServer r) {
                     getSession(client.remoteEndpoint(), client, d1, d2);

@@ -17,7 +17,6 @@
 package swift.application.social.cs;
 
 import static java.lang.System.exit;
-import static sys.net.api.Networking.Networking;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -28,6 +27,7 @@ import swift.application.social.SwiftSocialOps;
 import swift.dc.DCSequencerServer;
 import swift.dc.DCServer;
 import sys.net.api.Endpoint;
+import sys.net.api.Networking;
 import sys.net.api.rpc.RpcEndpoint;
 import sys.utils.Args;
 
@@ -45,7 +45,7 @@ public class SwiftSocialBenchmarkClient extends SwiftSocialBenchmark {
 
     public void init(String[] args) {
         int port = SwiftSocialBenchmarkServer.SCOUT_PORT + Args.valueOf(args, "-instance", 0);
-        server = Networking.resolve(Args.valueOf(args, "-servers", "localhost"), port);
+        server = Networking.getInstance().resolve(Args.valueOf(args, "-servers", "localhost"), port);
     }
 
     @Override
@@ -73,7 +73,7 @@ public class SwiftSocialBenchmarkClient extends SwiftSocialBenchmark {
     RpcEndpoint endpointFor(SwiftSocialOps session) {
         RpcEndpoint res = endpoints.get(session);
         if (res == null)
-            endpoints.put(session, res = Networking.rpcConnect().toDefaultService());
+            endpoints.put(session, res = Networking.getInstance().rpcConnect().toDefaultService());
         return res;
     }
 

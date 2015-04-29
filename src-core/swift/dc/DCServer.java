@@ -21,7 +21,6 @@ import static swift.dc.DCConstants.PRUNE_POLICY;
 import static swift.dc.DCConstants.SEQUENCER_PORT;
 import static swift.dc.DCConstants.SURROGATE_PORT;
 import static swift.dc.DCConstants.SURROGATE_PORT_FOR_SEQUENCERS;
-import static sys.net.api.Networking.Networking;
 
 import java.util.List;
 import java.util.Properties;
@@ -30,6 +29,7 @@ import swift.utils.SafeLog;
 import sys.Sys;
 import sys.herd.Herd;
 import sys.net.api.Endpoint;
+import sys.net.api.Networking;
 import sys.utils.Args;
 import sys.utils.Threading;
 
@@ -57,7 +57,7 @@ public class DCServer {
     public void startSurrogServer(String siteId, int port4Clients, int port4Sequencers, int portSequencer) {
         Sys.getInstance();
 
-        Endpoint sequencer = Networking.resolve(sequencerHost, portSequencer);
+        Endpoint sequencer = Networking.getInstance().resolve(sequencerHost, portSequencer);
 
         server = new DCSurrogate(siteId, port4Clients, port4Sequencers, sequencer, props);
     }

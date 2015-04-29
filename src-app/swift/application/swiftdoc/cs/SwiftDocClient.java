@@ -16,8 +16,6 @@
  *****************************************************************************/
 package swift.application.swiftdoc.cs;
 
-import static sys.net.api.Networking.Networking;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,6 +31,7 @@ import swift.application.swiftdoc.cs.msgs.InsertAtom;
 import swift.application.swiftdoc.cs.msgs.RemoveAtom;
 import swift.application.swiftdoc.cs.msgs.ServerReply;
 import sys.net.api.Endpoint;
+import sys.net.api.Networking;
 import sys.net.api.Networking.TransportProvider;
 import sys.net.api.rpc.RpcEndpoint;
 import sys.utils.Threading;
@@ -68,12 +67,12 @@ public class SwiftDocClient {
     }
 
     static void runClient1Code(String server) {
-        Endpoint srv = Networking.resolve(server, SwiftDocServer.PORT1);
+        Endpoint srv = Networking.getInstance().resolve(server, SwiftDocServer.PORT1);
         client1Code(srv);
     }
 
     static void runClient2Code(String server) {
-        Endpoint srv = Networking.resolve(server, SwiftDocServer.PORT2);
+        Endpoint srv = Networking.getInstance().resolve(server, SwiftDocServer.PORT2);
         client2Code(srv);
     }
 
@@ -90,7 +89,7 @@ public class SwiftDocClient {
     static void client1Code(final Endpoint server) {
         final int TIMEOUT = Integer.MAX_VALUE >> 1;
 
-        final RpcEndpoint endpoint = Networking.rpcConnect(TransportProvider.DEFAULT).toDefaultService();
+        final RpcEndpoint endpoint = Networking.getInstance().rpcConnect(TransportProvider.DEFAULT).toDefaultService();
 
         final List<Long> results = new ArrayList<Long>();
 
@@ -174,7 +173,7 @@ public class SwiftDocClient {
 
         final AckHandler ackHandler = new AckHandler();
 
-        final RpcEndpoint endpoint = Networking.rpcConnect(TransportProvider.DEFAULT).toDefaultService();
+        final RpcEndpoint endpoint = Networking.getInstance().rpcConnect(TransportProvider.DEFAULT).toDefaultService();
 
         try {
             endpoint.send(server, new InitScoutServer(), new AppRpcHandler() {

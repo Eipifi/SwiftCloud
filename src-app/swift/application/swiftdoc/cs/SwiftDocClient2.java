@@ -16,8 +16,6 @@
  *****************************************************************************/
 package swift.application.swiftdoc.cs;
 
-import static sys.net.api.Networking.Networking;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,6 +34,7 @@ import swift.application.swiftdoc.cs.msgs.ServerReply;
 import swift.application.swiftdoc.cs.msgs.SwiftDocRpc;
 import swift.dc.DCConstants;
 import sys.net.api.Endpoint;
+import sys.net.api.Networking;
 import sys.net.api.Networking.TransportProvider;
 import sys.net.api.TransportConnection;
 import sys.net.api.rpc.RpcEndpoint;
@@ -80,13 +79,13 @@ public class SwiftDocClient2 {
     }
 
     static void runClient1Code(String server, String dcName) throws Exception {
-        Endpoint srv = Networking.resolve(server, SwiftDocServer.PORT1);
-        Endpoint dc = Networking.resolve(dcName, DCConstants.SURROGATE_PORT);
+        Endpoint srv = Networking.getInstance().resolve(server, SwiftDocServer.PORT1);
+        Endpoint dc = Networking.getInstance().resolve(dcName, DCConstants.SURROGATE_PORT);
         client1Code(srv, dc);
     }
 
     static void runClient2Code(String server) throws Exception {
-        Endpoint srv = Networking.resolve(server, SwiftDocServer.PORT2);
+        Endpoint srv = Networking.getInstance().resolve(server, SwiftDocServer.PORT2);
         client2Code(srv);
     }
 
@@ -124,7 +123,7 @@ public class SwiftDocClient2 {
         // }
         // };
 
-        final RpcEndpoint endpoint = Networking.rpcConnect(TransportProvider.DEFAULT).toDefaultService();
+        final RpcEndpoint endpoint = Networking.getInstance().rpcConnect(TransportProvider.DEFAULT).toDefaultService();
 
         final List<Long> results = new ArrayList<Long>();
 
@@ -231,7 +230,7 @@ public class SwiftDocClient2 {
 
         final AckHandler ackHandler = new AckHandler();
 
-        final RpcEndpoint endpoint = Networking.rpcConnect(TransportProvider.DEFAULT).toDefaultService();
+        final RpcEndpoint endpoint = Networking.getInstance().rpcConnect(TransportProvider.DEFAULT).toDefaultService();
 
         try {
             endpoint.send(server, new InitScoutServer(), new AppRpcHandler() {

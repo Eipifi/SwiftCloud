@@ -16,8 +16,6 @@
  *****************************************************************************/
 package swift.application.social.cs;
 
-import static sys.net.api.Networking.Networking;
-
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -27,6 +25,7 @@ import swift.application.social.SwiftSocialApp;
 import swift.application.social.SwiftSocialBenchmark;
 import swift.application.social.SwiftSocialOps;
 import sys.ec2.ClosestDomain;
+import sys.net.api.Networking;
 import sys.net.api.Networking.TransportProvider;
 import sys.net.api.rpc.RpcHandle;
 import sys.utils.Args;
@@ -65,7 +64,7 @@ public class SwiftSocialBenchmarkServer extends SwiftSocialBenchmark {
         // SwiftSocialMain.cacheSize = cache;
 
         int instance = Args.valueOf(args, "-instance", 0);
-        Networking.rpcBind(SCOUT_PORT + instance, TransportProvider.DEFAULT).toService(0, new RequestHandler() {
+        Networking.getInstance().rpcBind(SCOUT_PORT + instance, TransportProvider.DEFAULT).toService(0, new RequestHandler() {
 
             @Override
             public void onReceive(final RpcHandle handle, final Request m) {

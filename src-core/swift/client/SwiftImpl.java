@@ -16,8 +16,6 @@
  *****************************************************************************/
 package swift.client;
 
-import static sys.net.api.Networking.Networking;
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
@@ -96,6 +94,7 @@ import swift.utils.SafeLog.ReportType;
 import swift.utils.TransactionsLog;
 import sys.Sys;
 import sys.net.api.Endpoint;
+import sys.net.api.Networking;
 import sys.net.api.rpc.RpcEndpoint;
 import sys.net.api.rpc.RpcHandle;
 import sys.net.api.rpc.RpcHandler;
@@ -190,7 +189,7 @@ public class SwiftImpl implements SwiftScout, TxnManager, FailOverHandler {
 
     public static SwiftSession newSingleSessionInstance(SwiftOptions options, String sessionId) {
         Endpoint[] servers = parseEndpoints(options.getServerHostname());
-        final SwiftScout sharedImpl = new SwiftImpl(Networking.rpcConnect().toDefaultService(), servers, options,
+        final SwiftScout sharedImpl = new SwiftImpl(Networking.getInstance().rpcConnect().toDefaultService(), servers, options,
                 sessionId);
         return sharedImpl.newSession(sessionId);
     }
@@ -206,7 +205,7 @@ public class SwiftImpl implements SwiftScout, TxnManager, FailOverHandler {
     public static SwiftScout newMultiSessionInstance(final SwiftOptions options) {
         Endpoint[] servers = parseEndpoints(options.getServerHostname());
 
-        return new SwiftImpl(Networking.rpcConnect().toDefaultService(), servers, options, "multi-session-instance");
+        return new SwiftImpl(Networking.getInstance().rpcConnect().toDefaultService(), servers, options, "multi-session-instance");
     }
 
     private static String generateScoutId() {
@@ -2069,7 +2068,7 @@ public class SwiftImpl implements SwiftScout, TxnManager, FailOverHandler {
     static Endpoint[] parseEndpoints(String serverList) {
         List<Endpoint> res = new ArrayList<Endpoint>();
         for (String i : serverList.split(","))
-            res.add(Networking.resolve(i, DCConstants.SURROGATE_PORT));
+            res.add(Networking.getInstance().resolve(i, DCConstants.SURROGATE_PORT));
         return res.toArray(new Endpoint[res.size()]);
     }
 

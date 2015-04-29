@@ -26,8 +26,7 @@ import sys.net.impl.rpc.RpcFactoryImpl;
 
 public class NetworkingImpl extends Networking {
 
-    NetworkingImpl() {
-    }
+    public NetworkingImpl() { }
 
     public static void init() {
         new NetworkingImpl();

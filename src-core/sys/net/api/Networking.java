@@ -16,8 +16,10 @@
  *****************************************************************************/
 package sys.net.api;
 
-import sys.Sys;
 import sys.net.api.rpc.RpcFactory;
+import sys.net.impl.NetworkingImpl;
+
+import java.util.function.Supplier;
 
 /**
  * Used to obtain endpoints form performing message exchange.
@@ -27,17 +29,32 @@ import sys.net.api.rpc.RpcFactory;
  */
 abstract public class Networking {
 
-    static {
-        Sys.getInstance();
+    /**
+     * Upon proper initialization should point the an instance implementation.
+     *
+     * Intended for use as a singleton, properly initialized when appropriate.
+     * To customize the instance, use the setInstance method.
+     */
+    private static Networking instance;
+    public static Supplier<Networking> defaultSupplier = NetworkingImpl::new;
+
+    public static Networking getInstance() {
+        if (instance == null) setInstance(defaultSupplier.get());
+        return instance;
+    }
+
+    public static void setInstance(Networking newInstance) {
+        instance = newInstance;
     }
 
     public enum TransportProvider {
         DEFAULT, OIO_TCP, NETTY_IO_TCP, LZ4_OIO_TCP, INPROC
+
     }
 
     /**
      * Creates a local endpoint for accepting and sending messages
-     * 
+     *
      * @param tcpPort
      *            the port used for listening tcp connections
      * @param handler
@@ -49,7 +66,7 @@ abstract public class Networking {
     /**
      * Creates a local endpoint for accepting and sending messages, using the
      * provider specified.
-     * 
+     *
      * @param tcpPort
      *            the port used for listening for connections
      * @param provider
@@ -64,7 +81,7 @@ abstract public class Networking {
      * Creates an endpoint pointing to a remote location, identified by host/ip
      * and a port. Endpoints returned by this function serve only as locators
      * and cannot be used to initiate communication by themselves.
-     * 
+     *
      * @param address
      *            - the host/ip[:port] address of the remote location
      * @param tcpPort
@@ -78,7 +95,7 @@ abstract public class Networking {
      * Creates a local endpoint for accepting and sending messages according to
      * a simple RPC scheme. Allows for a sequence of cascading send/reply
      * message exchanges.
-     * 
+     *
      * @param tcpPort
      *            the listening port
      * @param provider
@@ -91,9 +108,7 @@ abstract public class Networking {
      * Creates a local endpoint for accepting and sending messages according to
      * a simple RPC scheme. Allows for a sequence of cascading send/reply
      * message exchanges.
-     * 
-     * @param tcpPort
-     *            the listening port
+     *
      * @param provider
      *            the provider user for accepting connections
      * @return
@@ -104,9 +119,7 @@ abstract public class Networking {
      * Creates a local endpoint form accepting and sending messages according to
      * a simple RPC scheme, using the default TCP provider. Allows for a
      * sequence of cascading send/reply message exchanges.
-     * 
-     * @param tcpPort
-     *            the listening port
+     *
      * @return
      */
     abstract public RpcFactory rpcConnect();
@@ -114,7 +127,7 @@ abstract public class Networking {
     /**
      * Creates a rpc factory, which allows to register an handler associated
      * with numbered rpc services.
-     * 
+     *
      * @param tcpPort
      *            the tcpPort used to send/receive messages for the rpc factory
      * @return
@@ -123,29 +136,16 @@ abstract public class Networking {
 
     /**
      * Obtains a singleton instance of a serializer object
-     * 
+     *
      * @return the serializer
      */
     abstract public Serializer serializer();
 
     /**
      * Sets the default transport provider...
-     * 
+     *
      * @param provider
      *            - the default provider used for rpc endpoints...
      */
     abstract public void setDefaultProvider(TransportProvider provider);
-
-    /**
-     * Upon proper initialization should point the an instance implementation.
-     * 
-     * Intended for use with static import, to mimic the use of static class
-     * methods. It should be possible to initialize with different types of
-     * implementation, such as one meant for simulated environment.
-     */
-    public static Networking Networking;
-
-    protected Networking() {
-        Networking = this;
-    }
 }

@@ -17,8 +17,6 @@
  *****************************************************************************/
 package swift.application.filesystem.cs;
 
-import static sys.net.api.Networking.Networking;
-
 import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
@@ -58,6 +56,7 @@ import swift.application.filesystem.cs.proto.UnlinkOperation;
 import swift.application.filesystem.cs.proto.WriteOperation;
 import sys.Sys;
 import sys.net.api.Endpoint;
+import sys.net.api.Networking;
 import sys.net.api.Networking.TransportProvider;
 import sys.net.api.rpc.RpcEndpoint;
 import sys.net.api.rpc.RpcHandle;
@@ -150,8 +149,8 @@ public class SwiftFuseClient implements Filesystem3 {
                 log.info("Initializing the system");
 
                 String fuseServer = args[0];
-                server = Networking.resolve(fuseServer, SwiftFuseServer.PORT);
-                endpoint = Networking.rpcConnect(TransportProvider.DEFAULT).toDefaultService();
+                server = Networking.getInstance().resolve(fuseServer, SwiftFuseServer.PORT);
+                endpoint = Networking.getInstance().rpcConnect(TransportProvider.DEFAULT).toDefaultService();
 
                 log.info("mounting filesystem : client code");
 

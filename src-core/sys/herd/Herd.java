@@ -16,8 +16,6 @@
  *****************************************************************************/
 package sys.herd;
 
-import static sys.net.api.Networking.Networking;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -31,6 +29,7 @@ import sys.herd.proto.HerdProtoHandler;
 import sys.herd.proto.JoinHerdReply;
 import sys.herd.proto.JoinHerdRequest;
 import sys.net.api.Endpoint;
+import sys.net.api.Networking;
 import sys.net.api.Networking.TransportProvider;
 import sys.net.api.rpc.RpcEndpoint;
 import sys.net.api.rpc.RpcHandle;
@@ -97,13 +96,13 @@ public class Herd extends HerdProtoHandler {
     }
 
     public static void setDefaultShepard(String shepardAddress) {
-        shepard = Networking.resolve(shepardAddress, PORT);
+        shepard = Networking.getInstance().resolve(shepardAddress, PORT);
     }
 
     public static void joinHerd(final String dc, final String herd, final Endpoint endpoint) {
         getHerd(dc, herd).sheep().add(endpoint);
         for (String s : surrogates) {
-            Endpoint e = Networking.resolve(s, DCConstants.SURROGATE_PORT);
+            Endpoint e = Networking.getInstance().resolve(s, DCConstants.SURROGATE_PORT);
             getHerd(dc, herd).sheep().add(e);
         }
         lastChange = 0;
@@ -112,8 +111,8 @@ public class Herd extends HerdProtoHandler {
     public static void joinHerd(final String dc, final String herd, final Endpoint endpoint, Endpoint shepardAddress) {
         Thread.dumpStack();
 
-        final Endpoint shepard = Networking.resolve(shepardAddress.getHost(), PORT);
-        final RpcEndpoint sock = Networking.rpcConnect(TransportProvider.DEFAULT).toDefaultService();
+        final Endpoint shepard = Networking.getInstance().resolve(shepardAddress.getHost(), PORT);
+        final RpcEndpoint sock = Networking.getInstance().rpcConnect(TransportProvider.DEFAULT).toDefaultService();
 
         Log.info(IP.localHostname() + " Contacting shepard at: " + shepard + " to join: " + herd);
         System.err.println(IP.localHostname() + " Contacting shepard at: " + shepard + " to join: " + herd);
@@ -144,7 +143,7 @@ public class Herd extends HerdProtoHandler {
     synchronized static public void initServer() {
         if (!inited)
             try {
-                Networking.rpcBind(PORT, TransportProvider.DEFAULT).toService(0, new HerdProtoHandler() {
+                Networking.getInstance().rpcBind(PORT, TransportProvider.DEFAULT).toService(0, new HerdProtoHandler() {
                     public void onReceive(RpcHandle conn, JoinHerdRequest r) {
 
                         JoinHerdReply reply;
