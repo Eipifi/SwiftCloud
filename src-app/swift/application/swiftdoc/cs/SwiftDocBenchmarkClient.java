@@ -48,7 +48,7 @@ public class SwiftDocBenchmarkClient {
             dcName = args[2];
             logger.info("Initializing the system");
 
-            Sys.init();
+            Sys.getInstance();
             DCSequencerServer.main(new String[] { "-name", "localhost" });
 
             // start DC server

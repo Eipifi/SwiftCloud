@@ -93,7 +93,7 @@ public class RiakMicroBenchmark implements WorkerManager {
         System.out.println("SAMPLE SIZE " + sampleSize + " MAX_TX_SIZE " + maxTxSize + " NUM_WORKERS " + numWorkers
                 + " UPDATE_RATIO " + updateRatio + " EXECUTION_TIME_SECONDS " + execTime + " NUM_RUNS " + numRuns);
 
-        Sys.init();
+        Sys.getInstance();
         RiakMicroBenchmark mb = new RiakMicroBenchmark(populate, sampleSize, maxTxSize, numWorkers, updateRatio,
                 1000 * execTime, numRuns, outputDir);
         try {

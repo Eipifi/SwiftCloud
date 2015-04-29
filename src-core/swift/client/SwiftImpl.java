@@ -94,6 +94,7 @@ import swift.utils.NoFlushLogDecorator;
 import swift.utils.SafeLog;
 import swift.utils.SafeLog.ReportType;
 import swift.utils.TransactionsLog;
+import sys.Sys;
 import sys.net.api.Endpoint;
 import sys.net.api.rpc.RpcEndpoint;
 import sys.net.api.rpc.RpcHandle;
@@ -2080,7 +2081,7 @@ public class SwiftImpl implements SwiftScout, TxnManager, FailOverHandler {
 
         public void run() {
             for (;;) {
-                Threading.sleep((30 + sys.Sys.Sys.rg.nextInt(10)) * 1000);
+                Threading.sleep((30 + Sys.getInstance().rg.nextInt(10)) * 1000);
                 serverIndex = (serverIndex + 1) % serverEndpoints.length;
                 // TODO: replace with logging or stats?
                 System.out.println("SYS FAILOVER TO INITIATED: " + serverEndpoint());

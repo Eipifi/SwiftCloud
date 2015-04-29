@@ -58,7 +58,7 @@ public class SwiftDocBenchmark {
 
         logger.info("Initializing the system");
 
-        Sys.init();
+        Sys.getInstance();
         SwiftOptions options = new SwiftOptions(dcName, dcPort);
         options.setConcurrentOpenTransactions(true);
         options.setDisasterSafe(false);

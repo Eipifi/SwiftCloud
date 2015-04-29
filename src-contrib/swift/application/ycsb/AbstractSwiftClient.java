@@ -57,7 +57,7 @@ public abstract class AbstractSwiftClient extends DB {
     @Override
     public void init() throws DBException {
         super.init();
-        Sys.init();
+        Sys.getInstance();
 
         final Properties props = getProperties();
         String hostname = props.getProperty("swift.hostname");

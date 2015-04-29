@@ -50,7 +50,7 @@ public class SwiftDocBenchmarkServer {
 
             logger.info("Initializing the system");
 
-            Sys.init();
+            Sys.getInstance();
 
             if (serverId == 1 || serverId == 3) {
                 logger.info("Starting scout/server 1");

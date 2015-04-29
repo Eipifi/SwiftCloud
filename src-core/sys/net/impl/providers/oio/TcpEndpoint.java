@@ -16,8 +16,6 @@
  *****************************************************************************/
 package sys.net.impl.providers.oio;
 
-import static sys.Sys.Sys;
-
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -30,6 +28,7 @@ import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import sys.Sys;
 import sys.net.api.Endpoint;
 import sys.net.api.Message;
 import sys.net.api.NetworkingException;
@@ -55,7 +54,7 @@ final public class TcpEndpoint extends AbstractLocalEndpoint implements Runnable
 
     public TcpEndpoint(Endpoint local, int tcpPort) throws IOException {
         this.localEndpoint = local;
-        this.gid = Sys.rg.nextLong() >>> 1;
+        this.gid = Sys.getInstance().rg.nextLong() >>> 1;
 
         if (tcpPort >= 0) {
             ssc = ServerSocketChannel.open();
@@ -136,7 +135,7 @@ final public class TcpEndpoint extends AbstractLocalEndpoint implements Runnable
                     synchronized (inBuf) {
                         msg = inBuf.readClassAndObject(channel);
                         int msgSize = inBuf.msgSize;
-                        Sys.downloadedBytes.addAndGet(msgSize);
+                        Sys.getInstance().downloadedBytes.addAndGet(msgSize);
                         incomingBytesCounter.addAndGet(msgSize);
                         msg.setSize(msgSize);
                     }
@@ -168,7 +167,7 @@ final public class TcpEndpoint extends AbstractLocalEndpoint implements Runnable
         public boolean send(final Message msg) {
             try {
                 int msgSize = outBuf().writeClassAndObject(msg, channel);
-                Sys.uploadedBytes.getAndAdd(msgSize);
+                Sys.getInstance().uploadedBytes.getAndAdd(msgSize);
                 outgoingBytesCounter.getAndAdd(msgSize);
                 msg.setSize(msgSize);
                 return true;

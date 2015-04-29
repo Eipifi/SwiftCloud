@@ -95,7 +95,7 @@ public class SafeLog {
     }
 
     public synchronized static void configure(EnumSet<ReportType> reports) {
-        Sys.init();
+        Sys.getInstance();
         printlnComment("The log includes the following reports:");
         for (final ReportType report : reports) {
             enabledReportsEnumSet.add(report);

@@ -44,7 +44,7 @@ public class RpcServer extends Handler {
      */
     public static void main(final String[] args) {
 
-        Sys.init();
+        Sys.getInstance();
 
         KryoLib.register(Request.class, 0x100);
         KryoLib.register(Reply.class, 0x101);

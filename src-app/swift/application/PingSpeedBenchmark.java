@@ -65,7 +65,7 @@ public class PingSpeedBenchmark {
         System.out.println("");
 
         logger.info("Initializing the system");
-        Sys.init();
+        Sys.getInstance();
         SwiftSession swift = SwiftImpl.newSingleSessionInstance(new SwiftOptions(dcName, dcPort));
 
         if (clientId == 1) {

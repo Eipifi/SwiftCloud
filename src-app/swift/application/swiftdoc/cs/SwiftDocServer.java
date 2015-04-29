@@ -78,7 +78,7 @@ public class SwiftDocServer {
 
     public static void main(String[] args) {
         System.out.println("SwiftDoc Server start!");
-        Sys.init();
+        Sys.getInstance();
 
         // start sequencer server
         DCSequencerServer.main(new String[] { "-name", sequencerName });

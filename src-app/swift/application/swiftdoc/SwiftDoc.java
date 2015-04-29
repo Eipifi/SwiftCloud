@@ -81,7 +81,7 @@ public class SwiftDoc {
 
         Threading.newThread("client2", true, new Runnable() {
             public void run() {
-                Sys.init();
+                Sys.getInstance();
                 runClient1(swift1);
             }
         }).start();
@@ -90,7 +90,7 @@ public class SwiftDoc {
 
         Threading.newThread("client2", true, new Runnable() {
             public void run() {
-                Sys.init();
+                Sys.getInstance();
                 runClient2(swift2);
             }
         }).start();

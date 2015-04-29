@@ -107,7 +107,7 @@ public class SwiftMicroBenchmark implements WorkerManager {
             }
             outputDir = args[10];
         }
-        Sys.init();
+        Sys.getInstance();
         logger.info("SAMPLE SIZE " + sampleSize + " MAX_TX_SIZE " + maxTxSize + " NUM_WORKERS " + numWorkers
                 + " UPDATE_RATIO " + updateRatio + " EXECUTION_TIME_SECONDS " + execTime + " NUM_RUNS " + numRuns);
         SwiftMicroBenchmark mb = new SwiftMicroBenchmark(populate, sampleSize, cltSize, maxTxSize, numWorkers,

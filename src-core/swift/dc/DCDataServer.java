@@ -446,7 +446,7 @@ final class DCDataServer {
                 final ManagedCRDT<V> crdt = new ManagedCRDT<V>(grp.getTargetUID(), creationState, clk, true);
                 // FIXME: It used to say "will merge if object exists" - not so
                 // sure after the switch to op-based.
-                data = localPutCRDT(crdt);
+                data = (CRDTData<?>) localPutCRDT(crdt);
             }
             data.pruneIfPossible(pruningInterval + surrogate.timeSmootherRandom.get().nextInt(pruningInterval));
 

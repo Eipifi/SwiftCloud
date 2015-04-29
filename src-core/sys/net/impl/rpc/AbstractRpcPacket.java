@@ -16,7 +16,7 @@
  *****************************************************************************/
 package sys.net.impl.rpc;
 
-import static sys.Sys.Sys;
+import sys.Sys;
 import sys.net.api.Endpoint;
 import sys.net.api.Message;
 import sys.net.api.TransportConnection;
@@ -55,7 +55,7 @@ abstract class AbstractRpcPacket extends AbstractMessage implements Message, Rpc
     transient Throwable failureCause;
 
     protected AbstractRpcPacket() {
-        this.timestamp = Sys.timeMillis();
+        this.timestamp = Sys.getInstance().timeMillis();
     }
 
     final public void setDefaultTimeout(int ms) {

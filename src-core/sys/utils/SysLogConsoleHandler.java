@@ -16,6 +16,8 @@
  *****************************************************************************/
 package sys.utils;
 
+import sys.Sys;
+
 import java.util.logging.ConsoleHandler;
 import java.util.logging.LogRecord;
 
@@ -48,7 +50,7 @@ public class SysLogConsoleHandler extends ConsoleHandler {
             for (int i = stack.length; --i >= 0;)
                 if (name.equals(stack[i].getClassName()))
                     return String.format("[%5s : %4d : %.4f]", name, stack[i].getLineNumber(),
-                            sys.Sys.Sys.currentTime());
+                            Sys.getInstance().currentTime());
             return "[]";
         }
 

@@ -78,7 +78,7 @@ public class FilesystemBasicTest {
             // do nothing
         }
 
-        Sys.init();
+        Sys.getInstance();
         server = SwiftImpl.newSingleSessionInstance(new SwiftOptions(scoutName, DCConstants.SURROGATE_PORT));
 
         txn = server.beginTxn(IsolationLevel.SNAPSHOT_ISOLATION, CachePolicy.STRICTLY_MOST_RECENT, false);

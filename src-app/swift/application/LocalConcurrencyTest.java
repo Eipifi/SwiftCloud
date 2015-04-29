@@ -53,7 +53,7 @@ public class LocalConcurrencyTest {
         for (int i = 0; i < 5; i++) {
             Thread client = new Thread("client" + i) {
                 public void run() {
-                    Sys.init();
+                    Sys.getInstance();
                     SwiftSession clientServer = SwiftImpl.newSingleSessionInstance(new SwiftOptions("localhost",
                             DCConstants.SURROGATE_PORT));
                     clientCode(clientServer);

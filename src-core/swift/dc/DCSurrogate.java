@@ -724,7 +724,7 @@ final public class DCSurrogate extends SwiftProtocolHandler {
         }
 
         protected synchronized CausalityClock tryFireClientNotification() {
-            long now = Sys.Sys.timeMillis();
+            long now = Sys.getInstance().timeMillis();
             if (now <= (lastNotification + notificationPeriodMillis)) {
                 return null;
             }

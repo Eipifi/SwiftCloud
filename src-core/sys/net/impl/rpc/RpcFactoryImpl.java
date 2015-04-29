@@ -16,7 +16,6 @@
  *****************************************************************************/
 package sys.net.impl.rpc;
 
-import static sys.Sys.Sys;
 import static sys.net.impl.NetworkingConstants.RPC_CONNECTION_RETRIES;
 import static sys.net.impl.NetworkingConstants.RPC_CONNECTION_RETRY_DELAY;
 import static sys.net.impl.NetworkingConstants.RPC_MAX_SERVICE_ID;
@@ -27,6 +26,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 
+import sys.Sys;
 import sys.net.api.Endpoint;
 import sys.net.api.Message;
 import sys.net.api.MessageHandler;
@@ -103,17 +103,17 @@ final public class RpcFactoryImpl implements RpcFactory, MessageHandler {
         this.executor = executor;
     }
 
-    static boolean isServer = Sys.mainClass.indexOf("Server") >= 0;
-    static double T0 = Sys.currentTime();
+    static boolean isServer = Sys.getInstance().mainClass.contains("Server");
+    static double T0 = Sys.getInstance().currentTime();
     static AtomicInteger totRPCs = new AtomicInteger(0);
     static {
         new PeriodicTask(0, 5) {
             public void run() {
                 if (isServer) {
-                    double elapsed = Sys.currentTime() - T0;
-                    Log.info(String.format("%s RPC/s:%.1f\n", Sys.mainClass, totRPCs.get() / elapsed));
+                    double elapsed = Sys.getInstance().currentTime() - T0;
+                    Log.info(String.format("%s RPC/s:%.1f\n", Sys.getInstance().mainClass, totRPCs.get() / elapsed));
                     if (elapsed > 10.0) {
-                        T0 = Sys.currentTime();
+                        T0 = Sys.getInstance().currentTime();
                         totRPCs.set(0);
                     }
                 }
@@ -133,7 +133,7 @@ final public class RpcFactoryImpl implements RpcFactory, MessageHandler {
             pkt.remote = conn.remoteEndpoint();
             handler.deliver(pkt);
         } else {
-            Log.warning(sys.Sys.Sys.mainClass + " - No handler for: " + pkt.payload.getClass() + " " + pkt.handlerId);
+            Log.warning(Sys.getInstance().mainClass + " - No handler for: " + pkt.payload.getClass() + " " + pkt.handlerId);
         }
     }
 

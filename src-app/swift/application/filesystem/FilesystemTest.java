@@ -53,7 +53,7 @@ public class FilesystemTest {
             // do nothing
         }
 
-        Sys.init();
+        Sys.getInstance();
         SwiftSession server = SwiftImpl
                 .newSingleSessionInstance(new SwiftOptions(scoutName, DCConstants.SURROGATE_PORT));
 

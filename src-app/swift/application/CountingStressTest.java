@@ -54,7 +54,7 @@ public class CountingStressTest {
         // start DC server
         DCServer.main(new String[] { sequencerName });
 
-        Sys.init();
+        Sys.getInstance();
         final Thread[] clientThreads = new Thread[CLIENTS_NUMBER];
         for (int i = 0; i < clientThreads.length; i++) {
             final int id = i;

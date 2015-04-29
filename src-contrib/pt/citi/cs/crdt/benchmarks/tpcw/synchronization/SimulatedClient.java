@@ -44,7 +44,7 @@ public class SimulatedClient {
     // Default Port 8777
 
     public static void main(String[] args) {
-        Sys.init();
+        Sys.getInstance();
         final String hostname = args[0];
         final int port = Integer.parseInt(args[1]);
         final String outputFileName = args[2];

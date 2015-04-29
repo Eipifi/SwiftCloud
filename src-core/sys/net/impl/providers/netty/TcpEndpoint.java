@@ -1,6 +1,5 @@
 package sys.net.impl.providers.netty;
 
-import static sys.Sys.Sys;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.ByteBuf;
@@ -24,6 +23,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
+import sys.Sys;
 import sys.net.api.Endpoint;
 import sys.net.api.Message;
 import sys.net.api.TransportConnection;
@@ -45,7 +45,7 @@ public class TcpEndpoint extends AbstractLocalEndpoint {
 
     public TcpEndpoint(Endpoint local, int tcpPort) throws IOException {
         this.localEndpoint = local;
-        this.gid = Sys.rg.nextLong() >>> 1;
+        this.gid = Sys.getInstance().rg.nextLong() >>> 1;
 
         boolean isServer = tcpPort >= 0;
 

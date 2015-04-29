@@ -145,7 +145,7 @@ public class SwiftFuseClient implements Filesystem3 {
                 System.out.println("Usage: [fuse scout/server address] [fuse args]");
                 return;
             } else {
-                Sys.init();
+                Sys.getInstance();
 
                 log.info("Initializing the system");
 

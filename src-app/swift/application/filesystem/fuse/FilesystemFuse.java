@@ -704,7 +704,7 @@ public class FilesystemFuse implements Filesystem3, XattrSupport {
         } catch (InterruptedException e) {
             // do nothing
         }
-        Sys.init();
+        Sys.getInstance();
         server = SwiftImpl.newSingleSessionInstance(new SwiftOptions(scoutName, DCConstants.SURROGATE_PORT));
 
     }

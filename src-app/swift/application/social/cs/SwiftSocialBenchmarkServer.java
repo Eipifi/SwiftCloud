@@ -43,7 +43,7 @@ public class SwiftSocialBenchmarkServer extends SwiftSocialBenchmark {
     public static int SCOUT_PORT = 26667;
 
     public static void main(String[] args) {
-        sys.Sys.init();
+        sys.Sys.getInstance();
 
         String partitions = Args.valueOf(args, "-partitions", "1/1");
         int site = Integer.valueOf(partitions.split("/")[0]);

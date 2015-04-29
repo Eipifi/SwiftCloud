@@ -16,7 +16,7 @@
  *****************************************************************************/
 package sys.net.impl;
 
-import static sys.Sys.Sys;
+import static sys.Sys.instance;
 import static sys.net.api.Networking.Networking;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -47,7 +47,7 @@ public class RpcClient {
 
         final Endpoint server = Networking.resolve(serverAddr, RpcServer.PORT);
 
-        double T0 = Sys.currentTime(), T = 0;
+        double T0 = instance.currentTime(), T = 0;
 
         final ConcurrentHashMap<Long, Long> values = new ConcurrentHashMap<Long, Long>();
 
@@ -70,11 +70,11 @@ public class RpcClient {
 
             }, 0);
 
-            double now = Sys.currentTime();
+            double now = instance.currentTime();
             if (index == 0 && (now - T) > 15) {
                 T = now;
                 final double total = rttCount.get();
-                double elapsed = Sys.currentTime() - T0;
+                double elapsed = instance.currentTime() - T0;
                 System.out.printf(endpoint.localEndpoint()
                         + " #total %.0f, RPCs/sec %.1f Lag %d rpcs, avg RTT %.0f us\n", total, total / elapsed,
                         values.size(), rttSum.get() / total);
@@ -94,7 +94,7 @@ public class RpcClient {
 
         String serverAddr = args.length > 0 ? args[0] : "localhost";
 
-        sys.Sys.init();
+        sys.Sys.getInstance();
 
         KryoLib.register(Request.class, 0x100);
         KryoLib.register(Reply.class, 0x101);

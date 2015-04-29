@@ -17,8 +17,6 @@
 package swift.application.social;
 
 import static java.lang.System.exit;
-import static sys.Sys.Sys;
-
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
@@ -34,6 +32,7 @@ import swift.dc.DCSequencerServer;
 import swift.dc.DCServer;
 import swift.utils.SafeLog;
 import swift.utils.SafeLog.ReportType;
+import sys.Sys;
 import sys.ec2.ClosestDomain;
 import sys.herd.Shepard;
 import sys.scheduler.PeriodicTask;
@@ -139,7 +138,7 @@ public class SwiftSocialBenchmark extends SwiftSocialApp {
                 public void run() {
                     // Randomize startup to avoid clients running all at the
                     // same time; causes problems akin to DDOS symptoms.
-                    Threading.sleep(Sys.rg.nextInt(10000));
+                    Threading.sleep(Sys.getInstance().rg.nextInt(10000));
                     SwiftSocialBenchmark.super.runClientSession(Integer.toString(sessionId), commands, false,
                             sessionOpsPerMs);
                 }
@@ -171,7 +170,7 @@ public class SwiftSocialBenchmark extends SwiftSocialApp {
     }
 
     public static void main(String[] args) {
-        sys.Sys.init();
+        sys.Sys.getInstance();
 
         SwiftSocialBenchmark instance = new SwiftSocialBenchmark();
         if (args.length == 0) {

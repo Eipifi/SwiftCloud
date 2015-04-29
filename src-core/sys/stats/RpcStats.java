@@ -16,14 +16,9 @@
  *****************************************************************************/
 package sys.stats;
 
-import static sys.Sys.Sys;
-
-import java.util.HashMap;
-import java.util.Map;
 import java.util.logging.Logger;
 
-import sys.net.api.Endpoint;
-import sys.net.impl.rpc.RpcPacket;
+import sys.Sys;
 import sys.scheduler.PeriodicTask;
 import sys.stats.sources.ValueSignalSource;
 import sys.utils.XmlExternalizable;
@@ -39,7 +34,7 @@ public class RpcStats extends XmlExternalizable {
 
     public static double STATS_BIN_SIZE = 30.0;
 
-    public double T0 = Sys.currentTime();
+    public double T0 = Sys.getInstance().currentTime();
 
     // private Map<String, BinnedTally> rpcRTT = new HashMap<String,
     // BinnedTally>();
@@ -130,23 +125,23 @@ public class RpcStats extends XmlExternalizable {
             public void run() {
                 synchronized (RpcStats) {
                     try {
-
+                        Sys sys = Sys.getInstance();
                         Runtime rt = Runtime.getRuntime();
-                        int idx = sys.Sys.Sys.mainClass.indexOf("Server");
+                        int idx = sys.mainClass.indexOf("Server");
                         if (idx >= 0) {
-                            double elapsed = Sys.currentTime() - PT;
-                            double dlrate = (Sys.downloadedBytes.get() - DL) / elapsed;
-                            double ulrate = (Sys.uploadedBytes.get() - UL) / elapsed;
+                            double elapsed = sys.currentTime() - PT;
+                            double dlrate = (sys.downloadedBytes.get() - DL) / elapsed;
+                            double ulrate = (sys.uploadedBytes.get() - UL) / elapsed;
                             if (elapsed > 15) {
                                 PT += elapsed;
-                                DL = Sys.downloadedBytes.get();
-                                UL = Sys.uploadedBytes.get();
+                                DL = sys.downloadedBytes.get();
+                                UL = sys.uploadedBytes.get();
                             }
                             Log.info(String.format("%s  [Down:  %.1f KB/s, Up: %.1f KB/s Heap: %s/%sm]\n",
-                                    Sys.mainClass, dlrate / 1024, ulrate / 1024, rt.totalMemory() >> 20,
+                                    sys.mainClass, dlrate / 1024, ulrate / 1024, rt.totalMemory() >> 20,
                                     rt.maxMemory() >> 20));
                         }
-                        RpcStats.saveXmlTo("./tmp/" + Sys.mainClass + "-stats.xml");
+                        RpcStats.saveXmlTo("./tmp/" + sys.mainClass + "-stats.xml");
                         RpcStats.stats.dump();
                     } catch (Exception x) {
                         x.printStackTrace();

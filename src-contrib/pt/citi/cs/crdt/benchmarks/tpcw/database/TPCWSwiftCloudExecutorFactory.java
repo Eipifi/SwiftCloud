@@ -93,7 +93,7 @@ public class TPCWSwiftCloudExecutorFactory extends AbstractDatabaseExecutorFacto
 
     private void init() {
 
-        Sys.init();
+        Sys.getInstance();
         if (!conf.containsKey("ConsistencyLevels")) {
             System.out.println("WARNING: Replication values not found");
         } else {

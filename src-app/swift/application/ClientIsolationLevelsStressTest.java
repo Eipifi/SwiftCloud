@@ -49,7 +49,7 @@ public class ClientIsolationLevelsStressTest {
         // start DC server
         DCServer.main(new String[] { sequencerName });
 
-        Sys.init();
+        Sys.getInstance();
         final SwiftOptions options = new SwiftOptions("localhost", DCConstants.SURROGATE_PORT);
         options.setMaxCommitBatchSize(10);
         final Thread[] clientThreads = new Thread[CLIENTS_NUMBER];

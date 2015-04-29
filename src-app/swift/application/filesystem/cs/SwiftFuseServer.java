@@ -72,7 +72,7 @@ public class SwiftFuseServer extends RemoteFuseOperationHandler {
             dcServer = Args.valueOf(args, "-server", "localhost");
         }
 
-        Sys.init();
+        Sys.getInstance();
 
         log.info("setting up servers");
         endpoint = Networking.rpcBind(PORT, TransportProvider.DEFAULT).toService(0, this);

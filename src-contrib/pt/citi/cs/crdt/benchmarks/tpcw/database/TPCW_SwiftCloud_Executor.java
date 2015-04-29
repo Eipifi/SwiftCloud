@@ -185,7 +185,7 @@ public class TPCW_SwiftCloud_Executor implements DatabaseExecutorInterface {
 
         if (scout == null || stopped) {
 
-            Sys.init();
+            Sys.getInstance();
 
             // Only one scout entry is created
             for (String rand_host : connections.keySet()) {

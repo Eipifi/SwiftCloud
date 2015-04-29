@@ -92,7 +92,7 @@ public class Shepard extends ShepardProtoHandler {
     }
 
     public static void main(String[] args) {
-        sys.Sys.init();
+        sys.Sys.getInstance();
         int duration = Args.valueOf(args, "-duration", Integer.MAX_VALUE);
 
         try {

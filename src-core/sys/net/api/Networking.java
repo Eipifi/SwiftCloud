@@ -28,7 +28,7 @@ import sys.net.api.rpc.RpcFactory;
 abstract public class Networking {
 
     static {
-        Sys.init();
+        Sys.getInstance();
     }
 
     public enum TransportProvider {

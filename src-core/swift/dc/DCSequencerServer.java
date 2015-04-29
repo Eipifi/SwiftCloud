@@ -266,7 +266,7 @@ public class DCSequencerServer extends SwiftProtocolHandler {
     }
 
     public void start() {
-        sys.Sys.init();
+        sys.Sys.getInstance();
 
         // Note: Networking.resolve() now accepts host[:port], the port
         // parameter is used as default, if port is missing

@@ -55,7 +55,7 @@ public class DCServer {
     }
 
     public void startSurrogServer(String siteId, int port4Clients, int port4Sequencers, int portSequencer) {
-        Sys.init();
+        Sys.getInstance();
 
         Endpoint sequencer = Networking.resolve(sequencerHost, portSequencer);
 

@@ -78,7 +78,7 @@ public class SwiftSocialBenchmarkClient extends SwiftSocialBenchmark {
     }
 
     public static void main(String[] args) {
-        sys.Sys.init();
+        sys.Sys.getInstance();
 
         SwiftSocialBenchmarkClient client = new SwiftSocialBenchmarkClient();
         if (args.length == 0) {
