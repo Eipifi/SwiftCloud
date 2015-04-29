@@ -1,4 +1,4 @@
-package swift.crdt;
+package swift.application.social.crdt;
 
 import java.util.Set;
 
@@ -9,12 +9,12 @@ import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.KryoSerializable;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
+import swift.crdt.AddWinsSetUpdate;
 
 public class AddWinsMessageSetUpdate extends AddWinsSetUpdate<Message, AddWinsMessageSetCRDT> implements
         KryoSerializable {
-    // Kryo-use only
-    public AddWinsMessageSetUpdate() {
-    }
+
+    public AddWinsMessageSetUpdate() { /* Kryo */ }
 
     public AddWinsMessageSetUpdate(Message val, TripleTimestamp newInstance, Set<TripleTimestamp> removedInstances) {
         super(val, newInstance, removedInstances);

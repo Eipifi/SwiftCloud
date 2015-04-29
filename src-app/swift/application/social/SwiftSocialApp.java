@@ -39,6 +39,7 @@ import swift.exceptions.VersionNotFoundException;
 import swift.exceptions.WrongTypeException;
 import swift.utils.SafeLog;
 import swift.utils.SafeLog.ReportType;
+import sys.net.impl.KryoLib;
 import sys.utils.Args;
 import sys.utils.Progress;
 import sys.utils.Props;
@@ -52,6 +53,11 @@ import sys.utils.Threading;
  */
 
 public class SwiftSocialApp {
+
+    static {
+        KryoLib.submit("social", new SocialClassRegistry());
+    }
+
     protected String server;
     protected IsolationLevel isolationLevel;
     protected CachePolicy cachePolicy;

@@ -18,11 +18,10 @@ package swift.utils;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-
-import swift.utils.KryoCRDTUtils.Registerable;
-
 import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.Serializer;
 import com.esotericsoftware.kryo.io.Output;
+import sys.net.impl.KryoClassRegistry;
 
 /**
  * Durable log using Kryo serialization and disk as a storage.
@@ -42,10 +41,11 @@ public class KryoDiskLog implements TransactionsLog {
      */
     public KryoDiskLog(final String fileName) throws FileNotFoundException {
         kryo = new Kryo();
-        KryoCRDTUtils.registerCRDTClasses(new Registerable() {
+        new KryoCRDTRegistry().registerClasses(new KryoClassRegistry.Registrable() {
+            private int id = 0;
             @Override
-            public void register(Class<?> cl, int id) {
-                kryo.register(cl, id);
+            public <T> void register(Class<T> cl, Serializer<? super T> sr) {
+                kryo.register(cl, ++id);
             }
         });
         output = new Output(new FileOutputStream(fileName));

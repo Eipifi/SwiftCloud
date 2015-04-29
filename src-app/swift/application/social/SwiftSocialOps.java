@@ -23,12 +23,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import swift.application.social.crdt.AddWinsMessageSetCRDT;
+import swift.application.social.crdt.LWWUserRegisterCRDT;
 import swift.crdt.AddWinsIdSetCRDT;
-import swift.crdt.AddWinsMessageSetCRDT;
 import swift.crdt.AddWinsSetCRDT;
 import swift.crdt.BloatedIntegerCRDT;
 import swift.crdt.IntegerCRDT;
-import swift.crdt.LWWUserRegisterCRDT;
 import swift.crdt.core.CRDT;
 import swift.crdt.core.CRDTIdentifier;
 import swift.crdt.core.CachePolicy;

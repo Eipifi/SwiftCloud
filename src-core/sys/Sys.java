@@ -16,7 +16,7 @@
  *****************************************************************************/
 package sys;
 
-import swift.utils.KryoCRDTUtils;
+import swift.utils.KryoCRDTRegistry;
 import sys.net.impl.KryoLib;
 import sys.scheduler.TaskScheduler;
 import sys.utils.IP;
@@ -36,8 +36,7 @@ public class Sys {
         instance = this; // Remove this line
         StackTraceElement[] sta = Thread.currentThread().getStackTrace();
         mainClass = sta[sta.length - 1].getClassName() + " @ " + IP.localHostname();
-        KryoCRDTUtils.init();
-        KryoLib.init();
+        KryoLib.submit("default", new KryoCRDTRegistry());
     }
 
     synchronized public static Sys getInstance() {

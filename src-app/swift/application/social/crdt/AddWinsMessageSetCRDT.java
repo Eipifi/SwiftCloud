@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-package swift.crdt;
+package swift.application.social.crdt;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,6 +23,9 @@ import java.util.Set;
 import swift.application.social.Message;
 import swift.clocks.CausalityClock;
 import swift.clocks.TripleTimestamp;
+import swift.crdt.AbstractAddWinsSetCRDT;
+import swift.crdt.AddWinsSetUpdate;
+import swift.crdt.AddWinsUtils;
 import swift.crdt.core.CRDTIdentifier;
 import swift.crdt.core.TxnHandle;
 
@@ -40,9 +43,7 @@ public class AddWinsMessageSetCRDT extends AbstractAddWinsSetCRDT<Message, AddWi
         KryoSerializable {
     protected Map<Message, Set<TripleTimestamp>> elemsInstances;
 
-    // Kryo
-    public AddWinsMessageSetCRDT() {
-    }
+    public AddWinsMessageSetCRDT() { /* Kryo */ }
 
     public AddWinsMessageSetCRDT(CRDTIdentifier id) {
         super(id);

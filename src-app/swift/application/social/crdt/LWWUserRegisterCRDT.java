@@ -14,11 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-package swift.crdt;
+package swift.application.social.crdt;
 
 import swift.application.social.User;
 import swift.clocks.CausalityClock;
 import swift.clocks.TripleTimestamp;
+import swift.crdt.AbstractLWWRegisterCRDT;
+import swift.crdt.LWWRegisterUpdate;
 import swift.crdt.core.CRDTIdentifier;
 import swift.crdt.core.TxnHandle;
 
@@ -34,9 +36,8 @@ import swift.crdt.core.TxnHandle;
 // Set CRDTs, but perhaps suboptimal - we could enforce clonability of V and
 // clone values just after the API calls.
 public class LWWUserRegisterCRDT extends AbstractLWWRegisterCRDT<User, LWWUserRegisterCRDT> {
-    // Kryo
-    public LWWUserRegisterCRDT() {
-    }
+
+    public LWWUserRegisterCRDT() { /* Kryo */ }
 
     public LWWUserRegisterCRDT(CRDTIdentifier uid) {
         super(uid);
