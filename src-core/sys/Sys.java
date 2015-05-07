@@ -33,7 +33,6 @@ public class Sys {
     public String mainClass;
 
     protected Sys() {
-        instance = this; // Remove this line
         StackTraceElement[] sta = Thread.currentThread().getStackTrace();
         mainClass = sta[sta.length - 1].getClassName() + " @ " + IP.localHostname();
         KryoLib.submit("default", new KryoCRDTRegistry());

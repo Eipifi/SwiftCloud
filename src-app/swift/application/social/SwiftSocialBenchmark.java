@@ -170,7 +170,7 @@ public class SwiftSocialBenchmark extends SwiftSocialApp {
     }
 
     public static void main(String[] args) {
-        sys.Sys.getInstance();
+        Sys.getInstance();
 
         SwiftSocialBenchmark instance = new SwiftSocialBenchmark();
         if (args.length == 0) {
