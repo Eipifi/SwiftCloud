@@ -16,8 +16,6 @@
  *****************************************************************************/
 package sys.scheduler;
 
-import static sys.scheduler.VT_Scheduler.Scheduler;
-
 /**
  * 
  * This is the class for creating aperiodic tasks.
@@ -73,7 +71,7 @@ public class Task implements Comparable<Task> {
     public Task(TaskOwner owner, double due) {
         this.owner = owner;
         if (due >= 0)
-            Scheduler.schedule(this, due);
+            Scheduling.getScheduler().schedule(this, due);
         if (owner != null)
             owner.registerTask(this);
     }
@@ -81,8 +79,7 @@ public class Task implements Comparable<Task> {
     protected Task(TaskOwner owner, double due, double period) {
         this.owner = owner;
         this.period = period;
-
-        Scheduler.schedule(this, due);
+        Scheduling.getScheduler().schedule(this, due);
         if (owner != null)
             owner.registerTask(this);
     }
@@ -126,7 +123,7 @@ public class Task implements Comparable<Task> {
      */
     public void reSchedule(double t) {
         if (t >= 0)
-            Scheduler.reSchedule(this, t);
+            Scheduling.getScheduler().reSchedule(this, t);
         wasReScheduled = true;
     }
 
@@ -182,7 +179,7 @@ public class Task implements Comparable<Task> {
     }
 
     public void block() {
-        token = Scheduler.newToken();
+        token = Scheduling.getScheduler().newToken();
         token.block();
     }
 

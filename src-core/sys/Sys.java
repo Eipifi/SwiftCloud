@@ -18,7 +18,6 @@ package sys;
 
 import swift.utils.KryoCRDTRegistry;
 import sys.net.impl.KryoLib;
-import sys.scheduler.TaskScheduler;
 import sys.utils.IP;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
@@ -27,7 +26,6 @@ public class Sys {
     private static Sys instance;
 
     public Random rg = new Random();
-    public TaskScheduler scheduler = new TaskScheduler();
     public AtomicLong uploadedBytes = new AtomicLong(1);
     public AtomicLong downloadedBytes = new AtomicLong(1);
     public String mainClass;

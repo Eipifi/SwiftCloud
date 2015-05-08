@@ -26,10 +26,8 @@ import sys.utils.Threading;
  * A scheduler for scheduling tasks in real time.
  * 
  * @author smd
- * 
- * @param <T>
  */
-public class RT_Scheduler<T extends Task> extends VT_Scheduler<T> {
+public class RT_Scheduler extends VT_Scheduler {
 
     private static Logger Log = Logger.getLogger(RT_Scheduler.class.getName());
 

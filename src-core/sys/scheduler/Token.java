@@ -16,8 +16,6 @@
  *****************************************************************************/
 package sys.scheduler;
 
-import static sys.scheduler.VT_Scheduler.Scheduler;
-
 import java.util.concurrent.Semaphore;
 
 public class Token extends Semaphore {
@@ -27,11 +25,11 @@ public class Token extends Semaphore {
     }
 
     public void block() {
-        Scheduler.threadManager.acquire(this);
+        Scheduling.getScheduler().threadManager.acquire(this);
     }
 
     public void unblock() {
-        Scheduler.threadManager.release(this);
+        Scheduling.getScheduler().threadManager.release(this);
     }
 
     private static final long serialVersionUID = 1L;

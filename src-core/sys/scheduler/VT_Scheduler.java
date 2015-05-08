@@ -36,17 +36,19 @@ import sys.utils.Threading;
  * @author smduarte (smd@fct.unl.pt)
  * 
  */
-public class VT_Scheduler<T extends Task> implements Runnable {
+public class VT_Scheduler implements Runnable {
     private static Logger Log = Logger.getLogger(VT_Scheduler.class.getName());
 
     protected static final double NANOSECOND = 1e-9;
+    protected static double now = 0;
 
-    static VT_Scheduler<?> Scheduler;
-    protected boolean stopped;
+    protected final CustomPriorityQueue<Task> queue;
+    protected double rt1 = System.nanoTime(), rt0 = System.nanoTime();
+    protected final ThreadManager threadManager = new ThreadManager();
+    protected boolean stopped = false;
 
     protected VT_Scheduler() {
-        Scheduler = this;
-        queue = new CustomPriorityQueue<Task>();
+        queue = new CustomPriorityQueue<>();
     }
 
     public Token newToken() {
@@ -64,14 +66,14 @@ public class VT_Scheduler<T extends Task> implements Runnable {
      * Starts the scheduler and begins executing tasks in order.
      */
     public void start() {
-        new SchedulerThread(Scheduler).start();
+        new SchedulerThread(this).start();
         Threading.waitOn(this);
     }
 
     /**
      * Returns the number of simulation seconds that elapsed since the
      * simulation started.
-     * 
+     *
      * @return The number of simulation seconds that elapsed since the
      *         simulation started.
      */
@@ -82,7 +84,7 @@ public class VT_Scheduler<T extends Task> implements Runnable {
     /**
      * Returns the number of realtime seconds that elapsed since the simulation
      * started.
-     * 
+     *
      * @return The number of realtime seconds that elapsed since the simulation
      *         started.
      */
@@ -91,18 +93,9 @@ public class VT_Scheduler<T extends Task> implements Runnable {
     }
 
     /**
-     * Cancels all tasks in the scheduler queue, effectively ending the
-     * simulation.
-     */
-    public void cancelAll() {
-        for (Task i : queue)
-            i.cancel();
-    }
-
-    /**
      * Inserts a new task in the scheduler queue with a given execution
      * deadline.
-     * 
+     *
      * @param t
      *            The task to be scheduled.
      * @param due
@@ -120,7 +113,7 @@ public class VT_Scheduler<T extends Task> implements Runnable {
     /**
      * Re-inserts a task back into the scheduler queue with an updated execution
      * deadline.
-     * 
+     *
      * @param t
      *            The task to be re-scheduled.
      * @param due
@@ -146,32 +139,26 @@ public class VT_Scheduler<T extends Task> implements Runnable {
      * made to the Gui to check if there are any pending graphical elements that
      * need to be rendered. Gui (backbuffer) rendering is thread-safe if it is
      * done by the (current) thread running in the scheduler.
-     * 
+     *
      * @see java.lang.Runnable#run()
      */
     @Override
     public void run() {
         try {
-            mainLoop();
-        } catch (KillThreadException x) {
-        }
-
+            while (!queue.isEmpty() && !stopped) {
+                processNextTask();
+            }
+            stopped = true;
+        } catch (KillThreadException ignored) { }
         if (stopped)
             Threading.notifyOn(this);
     }
 
-    protected void mainLoop() {
-        while (!queue.isEmpty() && !stopped) {
-            processNextTask();
-        }
-        stopped = true;
-    }
-
     /**
-     * 
+     *
      * Resumes the execution of one of the ready threads (previously blocked in
      * a network I/O operation) or picks the next task to execute.
-     * 
+     *
      */
     protected void processNextTask() {
 
@@ -200,15 +187,6 @@ public class VT_Scheduler<T extends Task> implements Runnable {
         }
     }
 
-    public boolean isStopped() {
-        return stopped;
-    }
-
-    protected static double now = 0;
-    protected final CustomPriorityQueue<Task> queue;
-    protected double rt1 = System.nanoTime(), rt0 = System.nanoTime();
-    protected final ThreadManager threadManager = new ThreadManager();
-
     /**
      * This class manages the threads used in the simulation. The invariant
      * observed is that only one scheduler thread is executing at a given time.
@@ -229,9 +207,9 @@ public class VT_Scheduler<T extends Task> implements Runnable {
      */
     protected class ThreadManager {
 
-        private LinkedList<Token> spareThreads = new LinkedList<Token>();
-        private LinkedList<Token> readyThreads = new LinkedList<Token>();
-        private LinkedList<Token> waitingThreads = new LinkedList<Token>();
+        private LinkedList<Token> spareThreads = new LinkedList<>();
+        private LinkedList<Token> readyThreads = new LinkedList<>();
+        private LinkedList<Token> waitingThreads = new LinkedList<>();
 
         void relieve() {
             if (readyThreads.size() > 0) {
@@ -261,7 +239,7 @@ public class VT_Scheduler<T extends Task> implements Runnable {
             else if (spareThreads.size() > 0)
                 spareThreads.removeFirst().release();
             else {
-                new SchedulerThread(Scheduler).start();
+                new SchedulerThread(VT_Scheduler.this).start();
             }
             token.acquireUninterruptibly();
         }
