@@ -14,16 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-package swift.test.microbenchmark.interfaces;
+package swift.microbenchmark.interfaces;
 
-import swift.test.microbenchmark.RawDataCollector;
+import swift.microbenchmark.RawDataCollector;
 
-public interface WorkerManager {
+public interface MicroBenchmarkWorker extends Runnable {
 
-    public void onWorkerStart(MicroBenchmarkWorker worker);
+    void stop();
 
-    public void onWorkerFinish(MicroBenchmarkWorker worker);
+    ResultHandler getResults();
 
-    public RawDataCollector getNewRawDataCollector(String workerName, int runCount, String outputDir);
+    RawDataCollector getRawData();
+
+    String getWorkerID();
 
 }

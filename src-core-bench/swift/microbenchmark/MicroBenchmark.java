@@ -14,32 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-package swift.test.microbenchmark;
+package swift.microbenchmark;
 
-import swift.crdt.core.CRDTIdentifier;
-
-public class BenchOperation<V> {
-    private CRDTIdentifier identifier;
-    private V value;
-    private OpType type;
-
-    public BenchOperation(CRDTIdentifier identifier, V value, OpType type) {
-        super();
-        this.identifier = identifier;
-        this.value = value;
-        this.type = type;
-    }
-
-    public CRDTIdentifier getIdentifier() {
-        return identifier;
-    }
-
-    public V getValue() {
-        return value;
-    }
-
-    public OpType getType() {
-        return type;
-    }
+public class MicroBenchmark {
 
 }

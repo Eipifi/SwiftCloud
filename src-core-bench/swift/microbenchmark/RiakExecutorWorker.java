@@ -14,14 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-package swift.test.microbenchmark;
+package swift.microbenchmark;
 
 import java.nio.ByteBuffer;
 import java.util.Random;
 
-import swift.test.microbenchmark.interfaces.MicroBenchmarkWorker;
-import swift.test.microbenchmark.interfaces.ResultHandler;
-import swift.test.microbenchmark.interfaces.WorkerManager;
+import swift.microbenchmark.interfaces.MicroBenchmarkWorker;
+import swift.microbenchmark.interfaces.ResultHandler;
+import swift.microbenchmark.interfaces.WorkerManager;
 import sys.net.impl.KryoSerializer;
 
 import com.basho.riak.client.IRiakClient;

@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-package swift.test.microbenchmark;
+package swift.microbenchmark;
 
 import java.util.Random;
 
@@ -28,9 +28,9 @@ import swift.exceptions.NetworkException;
 import swift.exceptions.NoSuchObjectException;
 import swift.exceptions.VersionNotFoundException;
 import swift.exceptions.WrongTypeException;
-import swift.test.microbenchmark.interfaces.MicroBenchmarkWorker;
-import swift.test.microbenchmark.interfaces.ResultHandler;
-import swift.test.microbenchmark.interfaces.WorkerManager;
+import swift.microbenchmark.interfaces.MicroBenchmarkWorker;
+import swift.microbenchmark.interfaces.ResultHandler;
+import swift.microbenchmark.interfaces.WorkerManager;
 
 public class SwiftInitializerWorker implements MicroBenchmarkWorker {
 

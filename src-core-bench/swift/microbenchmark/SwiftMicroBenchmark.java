@@ -14,9 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-package swift.test.microbenchmark;
+package swift.microbenchmark;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,37 +26,44 @@ import java.util.Random;
 import java.util.concurrent.Semaphore;
 import java.util.logging.Logger;
 
-import swift.test.microbenchmark.interfaces.MicroBenchmarkWorker;
-import swift.test.microbenchmark.interfaces.ResultHandler;
-import swift.test.microbenchmark.interfaces.WorkerManager;
+import swift.crdt.core.CRDTIdentifier;
+import swift.crdt.core.CachePolicy;
+import swift.crdt.core.IsolationLevel;
+import swift.crdt.core.SwiftSession;
+import swift.dc.DCConstants;
+import swift.dc.DCSequencerServer;
+import swift.dc.DCServer;
+import swift.microbenchmark.interfaces.MicroBenchmarkWorker;
+import swift.microbenchmark.interfaces.ResultHandler;
+import swift.microbenchmark.interfaces.WorkerManager;
 import sys.Sys;
 
-import com.basho.riak.client.IRiakClient;
-import com.basho.riak.client.RiakException;
-
-public class RiakMicroBenchmark implements WorkerManager {
+public class SwiftMicroBenchmark implements WorkerManager {
 
     private boolean initialize;
     private Semaphore stopSemaphore;
     private Random random;
     private double updateRatio;
-    private int numObjects, maxTxSize, numWorkers, executionTime, runs;
-    private Map<String, List<ResultHandler>> results;
     private String outputDir;
-    private static Logger logger = Logger.getLogger("swift.benchmark");
+    private int numObjects, cltObjects, maxTxSize, numWorkers, executionTime, runs;
+    private Map<String, List<ResultHandler>> results;
 
-    private static final int /* valueLength = 20, valueLengthDeviation = 0 , */randomSeed = 1;
+    private static final int randomSeed = 1;
 
     public static final String TABLE_NAME = "BENCHMARK";
-    private static final int ESTIMATED_THGPT_MILLIS = 1;
-    private static String serverLocation = "localhost";
+    private static final int ESTIMATED_THGPT_MILLIS = 10;
+    private static String serverLocation = "127.0.0.1";
     private static int portId = 2001;
+    private static Logger logger = Logger.getLogger("swift.benchmark");
+    private static CachePolicy cachePolicy;
+    private static IsolationLevel isolationLevel;
 
-    public RiakMicroBenchmark(boolean initialize, int numObjects, int maxTxSize, int numWorkers, double updateRatio,
-            int executionTime, int runs, String outputDir) {
+    public SwiftMicroBenchmark(boolean initialize, int numObjects, int cltObjects, int maxTxSize, int numWorkers,
+            double updateRatio, int executionTime, int runs, String outputDir) {
         this.initialize = initialize;
         this.random = new Random(randomSeed);
         this.numObjects = numObjects;
+        this.cltObjects = cltObjects;
         this.maxTxSize = maxTxSize;
         this.numWorkers = numWorkers;
         this.updateRatio = updateRatio;
@@ -67,56 +75,62 @@ public class RiakMicroBenchmark implements WorkerManager {
 
     public static void main(String[] args) {
 
-        int sampleSize, maxTxSize, execTime, numRuns, numWorkers;
+        int sampleSize, cltSize, maxTxSize, execTime, numRuns, numWorkers;
         String outputDir;
         double updateRatio;
-        boolean populate = false;
-        if (args.length == 9) {
-            if (args[8].equals("-p"))
+        boolean populate = true;
+        if (args.length == 12) {
+            if (args[11].equals("-p"))
                 populate = true;
         }
 
-        if (args.length < 8 || args.length > 9) {
+        if (args.length < 11 || args.length > 12) {
             System.out
-                    .println("[SAMPLE SIZE]\t[MAX TX SIZE]\t[NUM WORKERS]\t[UPDATE RATIO]\t[EXECUTION TIME SECONDS]\t[NUM RUNS]\t[SERVER LOCATION]\t[OUTPUT DIRECTORY]");
+                    .println("[SAMPLE SIZE] [CLT SAMPLE SIZE] [MAX TX SIZE] [NUM WORKERS] [UPDATE RATIO] [EXECUTION TIME SECONDS] [NUM RUNS] [CACHE POLICY] [ISOLATION LEVEL] (SERVER LOCATION, LOCAL) [OUTPUTDIR]");
             return;
         } else {
             sampleSize = Integer.parseInt(args[0]);
-            maxTxSize = Integer.parseInt(args[1]);
-            numWorkers = Integer.parseInt(args[2]);
-            updateRatio = Double.parseDouble(args[3]);
-            execTime = Integer.parseInt(args[4]);
-            numRuns = Integer.parseInt(args[5]);
-            serverLocation = args[6];
-            outputDir = args[7];
+            cltSize = Integer.parseInt(args[1]);
+            maxTxSize = Integer.parseInt(args[2]);
+            numWorkers = Integer.parseInt(args[3]);
+            updateRatio = Double.parseDouble(args[4]);
+            execTime = Integer.parseInt(args[5]);
+            numRuns = Integer.parseInt(args[6]);
+            cachePolicy = CachePolicy.valueOf(args[7]);
+            isolationLevel = IsolationLevel.valueOf(args[8]);
+            if (args[9].equals("LOCAL")) {
+                serverLocation = "localhost";
+                startSequencer();
+                startDCServer();
+            } else {
+                serverLocation = args[9];
+            }
+            outputDir = args[10];
         }
-        System.out.println("SAMPLE SIZE " + sampleSize + " MAX_TX_SIZE " + maxTxSize + " NUM_WORKERS " + numWorkers
-                + " UPDATE_RATIO " + updateRatio + " EXECUTION_TIME_SECONDS " + execTime + " NUM_RUNS " + numRuns);
-
         Sys.getInstance();
-        RiakMicroBenchmark mb = new RiakMicroBenchmark(populate, sampleSize, maxTxSize, numWorkers, updateRatio,
-                1000 * execTime, numRuns, outputDir);
+        logger.info("SAMPLE SIZE " + sampleSize + " MAX_TX_SIZE " + maxTxSize + " NUM_WORKERS " + numWorkers
+                + " UPDATE_RATIO " + updateRatio + " EXECUTION_TIME_SECONDS " + execTime + " NUM_RUNS " + numRuns);
+        SwiftMicroBenchmark mb = new SwiftMicroBenchmark(populate, sampleSize, cltSize, maxTxSize, numWorkers,
+                updateRatio, 1000 * execTime, numRuns, outputDir);
         try {
             mb.doIt();
         } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (RiakException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
     }
 
-    public void doIt() throws InterruptedException, RiakException {
-        Integer[] identifiers = BenchUtil.generateIntegers(numObjects);
-        IRiakClient client = BenchUtil.getNewRiakClient(serverLocation, 8087);
+    public void doIt() throws InterruptedException {
+        CRDTIdentifier[] identifiers = BenchUtil.generateOpIdentifiers(numObjects);
+        SwiftSession client = BenchUtil.getNewSwiftInterface(serverLocation, DCConstants.SURROGATE_PORT);
         if (initialize) {
             stopSemaphore = new Semaphore(-1);
-            MicroBenchmarkWorker initializer = new RiakInitializerWorker(this, identifiers, random, client);
+            MicroBenchmarkWorker initializer = new SwiftInitializerWorker(this, identifiers, random, client);
             new Thread(initializer).start();
             try {
                 logger.info("START POPULATOR");
                 stopSemaphore.acquire();
+                client.stopScout(true);
                 logger.info("END POPULATOR");
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -125,25 +139,34 @@ public class RiakMicroBenchmark implements WorkerManager {
 
         for (int r = 0; r < runs; r++) {
             logger.info("WARMING UP FOR " + executionTime / 2 + "ms");
-            executeWorkers("WARM_UP", numWorkers, identifiers, executionTime / 2, client, r, outputDir);
+            executeWorkers("WARM_UP", numWorkers, identifiers, cltObjects, executionTime / 2, r, outputDir);
             logger.info("START");
-            executeWorkers("RiakWorker", numWorkers, identifiers, executionTime, client, r, outputDir);
+            executeWorkers("SwiftWorker", numWorkers, identifiers, cltObjects, executionTime, r, outputDir);
             logger.info("END");
 
         }
         printResults();
-
+        System.exit(0);
     }
 
-    private void executeWorkers(String workersName, int numWorkers, Integer[] identifiers, long executionTime,
-            IRiakClient client, int runCounter, String outputDir) throws InterruptedException {
+    private void executeWorkers(String workersName, int numWorkers, CRDTIdentifier[] identifiers, int cltObjects,
+            long executionTime, int runCount, String outputDir) throws InterruptedException {
         List<MicroBenchmarkWorker> workers = new ArrayList<MicroBenchmarkWorker>();
         stopSemaphore = new Semaphore(-numWorkers + 1);
+        // TODO: Use more then one client?
+        // Swift client = BenchUtil.getNewSwiftInterface(serverLocation,
+        // DCConstants.SURROGATE_PORT);
+        List<CRDTIdentifier> l = new ArrayList<CRDTIdentifier>();
+        for (int j = 0; j < identifiers.length; j++)
+            l.add(identifiers[j]);
         for (int i = 0; i < numWorkers; i++) {
-            // client = BenchUtil.getNewSwiftInterface(serverLocation,
-            // DCConstants.SURROGATE_PORT);
-            RiakExecutorWorker worker = new RiakExecutorWorker(this, workersName + i, identifiers, updateRatio, random,
-                    client, maxTxSize, runCounter, outputDir);
+            CRDTIdentifier[] ids = new CRDTIdentifier[cltObjects];
+            Collections.shuffle(l);
+            for (int j = 0; j < ids.length; j++)
+                ids[j] = l.get(j);
+            SwiftSession client = BenchUtil.getNewSwiftInterface(serverLocation, DCConstants.SURROGATE_PORT);
+            SwiftExecutorWorker worker = new SwiftExecutorWorker(this, workersName + i, ids, updateRatio, random,
+                    client, maxTxSize, cachePolicy, isolationLevel, runCount, outputDir);
             new Thread(worker).start();
             workers.add(worker);
 
@@ -156,8 +179,9 @@ public class RiakMicroBenchmark implements WorkerManager {
 
         }
         stopSemaphore.acquire();
-        if (!workersName.contains("WARM_UP"))
+        if (!workersName.equals("WARM_UP"))
             for (MicroBenchmarkWorker w : workers) {
+                w.getRawData().rawDataToFile();
                 // System.out.println(w.getRawData().RawData());
             }
     }
@@ -200,9 +224,9 @@ public class RiakMicroBenchmark implements WorkerManager {
             double readOps = 0;
             int runCounter = 1;
             for (ResultHandler run : workerResults.getValue()) {
-                if (run instanceof RiakOperationExecutorResultHandler) {
+                if (run instanceof SwiftOperationExecutorResultHandler) {
                     System.out.println("RUN " + runCounter++);
-                    RiakOperationExecutorResultHandler wr = (RiakOperationExecutorResultHandler) run;
+                    SwiftOperationExecutorResultHandler wr = (SwiftOperationExecutorResultHandler) run;
                     System.out.println(run.toString());
                     numExecutedTransactions += wr.getNumExecutedTransactions() / workerResults.getValue().size();
                     writeOps += wr.getWriteOps() / workerResults.getValue().size();
@@ -218,7 +242,7 @@ public class RiakMicroBenchmark implements WorkerManager {
         results += "Executed Transactions:\t" + totalExecutedTransactions + " W:\t" + totalWriteOps + "\tR:\t"
                 + totalReadOps + "\n";
         results += "Throughput(Tx/min):\t" + totalExecutedTransactions / ((executionTime / 1000) / 60d) + "\n";
-        results += "Throughput(Tx/sec):\t" + totalExecutedTransactions / ((executionTime / 1000)) + "\n";
+        results += "Throughput(Tx/s):\t" + totalExecutedTransactions / ((executionTime / 1000)) + "\n";
         System.out.println(results);
     }
 
@@ -228,4 +252,11 @@ public class RiakMicroBenchmark implements WorkerManager {
         return new RawDataCollector(initialSize, workerName, runCount, outputDir);
     }
 
+    private static void startDCServer() {
+        DCServer.main(new String[] { serverLocation });
+    }
+
+    private static void startSequencer() {
+        DCSequencerServer.main(new String[] { "-name", serverLocation });
+    }
 }

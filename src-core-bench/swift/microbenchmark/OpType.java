@@ -14,34 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-package swift.test.microbenchmark.objects;
+package swift.microbenchmark;
 
-import swift.crdt.core.Copyable;
-
-public class StringCopyable implements Copyable {
-
-    private String value;
-
-    public StringCopyable() {
-
-    }
-
-    public StringCopyable(String value) {
-        this.value = value;
-    }
-
-    @Override
-    public Object copy() {
-        return new StringCopyable(value);
-    }
-
-    public String getValue() {
-        return value;
-    }
-
-    @Override
-    public String toString() {
-        return value;
-    }
-
+public enum OpType {
+    READ_ONLY, UPDATE, INSERT, DELETE,
 }

@@ -16,6 +16,9 @@
  *****************************************************************************/
 package swift.dc.db;
 
+// Disabled for now because of the Riak client jar (2.0.0 for Antidote) version conflict
+
+/*
 import java.io.IOException;
 import java.util.Properties;
 
@@ -151,3 +154,4 @@ public class DCRiakDatabase implements DCNodeDatabase {
     }
 
 }
+*/
