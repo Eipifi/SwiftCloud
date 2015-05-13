@@ -153,11 +153,11 @@ final public class DCSurrogate extends SwiftProtocolHandler {
         srvEndpoint4Clients.getFactory().setExecutor(Executors.newCachedThreadPool());
         srvEndpoint4Sequencer.getFactory().setExecutor(Executors.newFixedThreadPool(2));
 
-        ArrayBlockingQueue<Runnable> crdtWorkQueue = new ArrayBlockingQueue<Runnable>(512);
+        ArrayBlockingQueue<Runnable> crdtWorkQueue = new ArrayBlockingQueue<>(512);
         crdtExecutor = new ThreadPoolExecutor(4, 8, 3, TimeUnit.SECONDS, crdtWorkQueue);
         crdtExecutor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
 
-        ArrayBlockingQueue<Runnable> generalWorkQueue = new ArrayBlockingQueue<Runnable>(512);
+        ArrayBlockingQueue<Runnable> generalWorkQueue = new ArrayBlockingQueue<>(512);
         generalExecutor = new ThreadPoolExecutor(4, 8, 3, TimeUnit.SECONDS, generalWorkQueue);
         generalExecutor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
 
@@ -184,7 +184,7 @@ final public class DCSurrogate extends SwiftProtocolHandler {
         }
 
         DHT_Node.init(siteId, "surrogates", srvEndpoint4Clients.localEndpoint());
-        new PeriodicTask(0.0, 0.1) {
+        new PeriodicTask(0.0, 0.9) {
             public void run() {
                 updateEstimatedDCVersion();
             }
@@ -192,8 +192,7 @@ final public class DCSurrogate extends SwiftProtocolHandler {
         final double CLOCKS_REPORTING_PERIOD_SEC = 30.0;
         new PeriodicTask(0.0, CLOCKS_REPORTING_PERIOD_SEC) {
             public void run() {
-                System.err.printf("DC %s: VV=%s, VV_K=%s\n", DCSurrogate.this.siteId,
-                        getEstimatedDCVersionCopy(), getEstimatedDCStableVersionCopy());
+                System.err.printf("DC %s: VV=%s, VV_K=%s\n", DCSurrogate.this.siteId, getEstimatedDCVersionCopy(), getEstimatedDCStableVersionCopy());
             };
         };
     }

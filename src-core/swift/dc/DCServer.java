@@ -48,17 +48,11 @@ public class DCServer {
     public DCServer(String sequencerHost, Properties props) {
         this.sequencerHost = sequencerHost;
         this.props = props;
-        init();
-    }
-
-    protected void init() {
     }
 
     public void startSurrogServer(String siteId, int port4Clients, int port4Sequencers, int portSequencer) {
         Sys.getInstance();
-
         Endpoint sequencer = Networking.getInstance().resolve(sequencerHost, portSequencer);
-
         server = new DCSurrogate(siteId, port4Clients, port4Sequencers, sequencer, props);
     }
 

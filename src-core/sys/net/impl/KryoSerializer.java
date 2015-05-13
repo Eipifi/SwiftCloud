@@ -31,13 +31,11 @@ public class KryoSerializer implements Serializer {
 
     private static Logger Log = Logger.getLogger(KryoSerializer.class.getName());
 
-    public KryoSerializer() {
-    }
+    public KryoSerializer() { }
 
     @Override
     public byte[] writeObject(Object obj) throws SerializerException {
         try {
-
             Output output = new Output(1 << 10, 1 << 22);
             KryoLib.kryo().writeClassAndObject(output, obj);
             output.close();
@@ -64,7 +62,7 @@ public class KryoSerializer implements Serializer {
             out.writeInt(bytes.length);
             out.write(bytes);
         } catch (IOException e) {
-            Log.fine(String.format("Kryo Serialization Exception: ", e.getMessage()));
+            Log.fine(String.format("Kryo Serialization Exception: %s", e.getMessage()));
             throw new SerializerException(e);
         }
     }
@@ -76,7 +74,7 @@ public class KryoSerializer implements Serializer {
             in.readInt();
             return (T) KryoLib.kryo().readClassAndObject(new Input(in));
         } catch (IOException e) {
-            Log.fine(String.format("Kryo Serialization Exception: ", e.getMessage()));
+            Log.fine(String.format("Kryo Serialization Exception: %s", e.getMessage()));
             throw new SerializerException(e);
         }
     }
